@@ -31,18 +31,26 @@
             text-align: center; 
         }
 
-        /* === СТИЛІ КНОПКИ КАНАЛУ (Go to Remaksiva) === */
+        /* === СТИЛІ ЛОГОТИПУ === */
+        #logo-image {
+            display: block; /* Забезпечує центрування */
+            margin: 0 auto 15px auto; /* Центрування та відступ знизу */
+            max-width: 150px; /* Обмеження розміру для ПК */
+            height: auto;
+            border-radius: 10px; /* Трохи заокруглюємо */
+            /* Додатковий стиль, щоб візуально підкреслити клікабельність */
+            transition: opacity 0.2s;
+            cursor: pointer; 
+        }
+        
+        #logo-image:hover {
+            opacity: 0.8; 
+        }
+        
+        /* === ЗОНА, ДЕ РАНІШЕ БУЛА КНОПКА (вирівнювання) === */
         #channelButtonContainer {
             text-align: center;
             margin-bottom: 20px;
-            
-
-            color: white !important;
-            background-color: #ff0000 !important; /* Червоний колір YouTube */
-            border-color: #ff0000 !important;
-            
-            
-            
         }
 
         /* Стиль заголовка таблиці */
@@ -104,10 +112,9 @@
         /* ========================================================= */
         @media (max-width: 992px) {
             
-            /* Нова кнопка каналу на мобільному (збільшення) */
-            #channelButtonContainer a.btn {
-                 font-size: 1.6em !important;
-                 padding: 10px 20px !important;
+            /* ЛОГОТИП НА МОБІЛЬНОМУ */
+            #logo-image {
+                max-width: 100px; /* Робимо його меншим, якщо потрібно */
             }
 
             /* 1. ВИПАДАЮЧЕ МЕНЮ (збільшення) */
@@ -137,10 +144,10 @@
     <div class="container">
         
         <div id="channelButtonContainer">
-             <a href="https://www.youtube.com/@remaksiva" target="_blank" class="btn btn-info btn-lg">
-                 <i class="fas fa-arrow-alt-circle-right"></i> Go to Remaksiva
+             <a href="https://www.youtube.com/@remaksiva" target="_blank">
+                <img id="logo-image" src="channels4_profile.jpg" alt="Channel Logo">
              </a>
-        </div>
+             </div>
         
         <h1>AUTHOR MEDIA VIDEO LINKS</h1>
         
@@ -158,134 +165,4 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
-    
-    <script>
-        function addCombinedAuthorFilter(table, startColumnIndex, endColumnIndex) {
-            const container = $('#filterContainer');
-            
-            let authors = [];
-            
-            for (let i = startColumnIndex; i <= endColumnIndex; i++) {
-                const columnData = table.column(i).data().toArray();
-                authors = authors.concat(columnData);
-            }
-
-            const uniqueAuthors = [...new Set(authors)]
-                .filter(a => a && a.toString().trim() !== '')
-                .map(a => a.toString().trim())
-                .sort((a, b) => a.localeCompare(b, 'uk', { sensitivity: 'base' })); 
-
-            const select = $('<select id="authorFilterSelect" class="form-select"><option value="">Filter by Author (All)</option></select>')
-                .appendTo(container);
-
-            uniqueAuthors.forEach(function(author) {
-                const display = author.length > 50 ? author.substring(0, 50) + '...' : author;
-                select.append('<option value="' + author + '">' + display + '</option>');
-            });
-
-            select.on('change', function() {
-                const searchValue = $(this).val();
-
-                if (searchValue) {
-                    table.search(searchValue, false, true, false).draw();
-                } else {
-                    table.search('', false, false, false).draw();
-                }
-            });
-        }
-
-
-        $(document).ready(function() {
-            
-            const csvFilePath = 'my_data.csv'; 
-            
-            $.get(csvFilePath, function(data) {
-                
-                const separator = ';'; 
-                const rows = data.replace(/"/g, '').split('\n').filter(row => row.trim() !== ''); 
-                
-                if (rows.length < 2) {
-                    $('#myDataTable').html('<div class="alert alert-warning text-center">Помилка: Файл CSV порожній.</div>');
-                    return;
-                }
-                
-                const headers = rows[0].split(separator); 
-                const tableData = [];
-                
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i].split(separator); 
-                    if (row.length > 23) {
-                        row.pop(); 
-                    }
-                    tableData.push(row); 
-                }
-
-                const columns = [];
-                const finalHeaderCount = headers.length - 1; 
-                
-                for (let i = 0; i < finalHeaderCount; i++) {
-                    let title = headers[i].trim();
-                    let dataIndex = i;
-                    let visible = false; 
-
-                    if (title === 'name') { 
-                        title = 'Clip Name';
-                        visible = true; 
-                    } else if (title === 'data') {
-                        title = 'Дата';
-                        visible = false; 
-                    } else if (title === 'link') {
-                        title = 'Links';
-                        visible = true; 
-                    } else if (title.startsWith('author')) {
-                        title = title.replace('author', 'Автор');
-                        visible = false; 
-                    }
-                    
-                    let columnDef = { data: dataIndex, title: title, visible: visible };
-                    
-                    if (title === 'Links') {
-                        // РЕНДЕР: Червона кнопка "YouTube"
-                        columnDef.render = function(data, type, row) {
-                             if (!data || type !== 'display') return data;
-                             return '<a href="' + data + '" target="_blank" class="btn btn-youtube btn-sm"><i class="fab fa-youtube"></i> YouTube</a>';
-                        };
-                        columnDef.className = 'dt-center'; 
-                    }
-                    
-                    columns.push(columnDef);
-                }
-                
-                const dataTable = $('#myDataTable').DataTable({
-                    data: tableData,
-                    columns: columns, 
-                    
-                    dom: 'tr p', 
-                    scrollX: true,
-                    processing: true,
-                    ordering: false, 
-
-                    pageLength: 50, 
-                    lengthMenu: [ 
-                        [50, 100, 200, -1],
-                        [50, 100, 200, "Всі"]
-                    ],
-
-                    columnDefs: [
-                         { targets: 0, className: 'dt-center' }, 
-                         { targets: 2, className: 'dt-center' } 
-                    ]
-                });
-
-                // Ініціалізація фільтра авторів
-                addCombinedAuthorFilter(dataTable, 3, 22); 
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                let errorMessage = "КРИТИЧНА ПОМИЛКА! Перевірте: 1) Роботу Python-сервера. 2) Файл 'my_data.csv' використовує ';' як роздільник.";
-                $('#myDataTable').html('<div class="alert alert-danger text-center mt-4">' + errorMessage + '</div>');
-            });
-        });
-    </script>
-</body>
-</html>
+    <script src="https://
