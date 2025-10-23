@@ -65,6 +65,18 @@
         table.dataTable thead tr:first-child th:last-child {
             border-top-right-radius: 8px !important;
         }
+        
+        /* === ГАРАНТОВАНЕ ПРИБИРАННЯ СОРТУВАЛЬНИХ ІКОНОК З ВИДИМОЇ КОЛОНКИ "ДАТА" (ІНДЕКС 2) === */
+        #myDataTable thead th:nth-child(3)::after, 
+        #myDataTable thead th:nth-child(3)::before {
+            display: none !important;
+        }
+        /* Прибираємо курсор "pointer" на цій колонці */
+        #myDataTable thead th:nth-child(3) {
+             cursor: default !important;
+        }
+        /* ===================================================================================== */
+
 
         /* === СТИЛІ КНОПКИ YOUTUBE === */
         .btn-youtube {
@@ -218,11 +230,8 @@
                 const searchValue = $(this).val();
 
                 if (searchValue) {
-                    // Використовуємо глобальний пошук DataTables
-                    // Дозволяє знайти значення у будь-якій колонці
                     table.search(searchValue).draw();
                 } else {
-                    // Скидаємо глобальний пошук
                     table.search('').draw();
                 }
             });
@@ -245,32 +254,52 @@
                 const headers = rows[0].split(separator); 
                 const tableData = [];
                 
-                // === ДИНАМІЧНИЙ ПОШУК ІНДЕКСУ ОСТАННЬОГО АВТОРА ===
                 let lastAuthorIndex = 2; 
                 
                 for (let i = 3; i < headers.length; i++) {
-                    // Перевіряємо, чи заголовок починається з 'author'
                     if (headers[i].trim().startsWith('author')) {
                         lastAuthorIndex = i;
                     }
                 }
-                // ===================================================
 
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i].split(separator); 
-                    // Тут було виправлення, яке прибирало останній елемент, 
-                    // якщо їх було більше 23, залишаємо це як є, але врахуємо, 
-                    // що якщо кількість авторів змінилася, цей рядок може потребувати уваги.
-                    // Наразі припускаємо, що це все ще актуально, або його можна прибрати.
-                    if (row.length > 23) {
-                         // Робимо більш динамічним, якщо це можливо:
-                         if (row.length > headers.length) {
-                             row.pop(); 
-                         }
+                    
+                    if (row.length === 0) continue; 
+                    
+                    // Знаходимо дату, яка була на індексі 1 в оригінальному CSV
+                    let originalDate = row[1]; 
+
+                    if (originalDate) {
+                        // ПЕРЕТВОРЮЄМО В КОРЕКТНИЙ СОРТОВАНИЙ ФОРМАТ 'YYYYMMDD'
+                        const parts = originalDate.split('.'); 
+                        const sortableDate = parts[2] + parts[1] + parts[0]; 
+                        
+                        // Видаляємо оригінальну дату з індексу 1
+                        row.splice(1, 1); 
+                        
+                        // Вставляємо приховану дату сортування на індекс 1
+                        row.splice(1, 0, sortableDate); 
+                        
+                        // Вставляємо видиму дату на індекс 2
+                        row.splice(2, 0, originalDate); 
                     }
+
+                    if (i === 1) { 
+                        lastAuthorIndex++;
+                    }
+
+                    if (row.length > headers.length + 1) { 
+                        row.pop();
+                    }
+                    
                     tableData.push(row); 
                 }
+                // ===================================================
 
+                // Додаємо заголовок для нової прихованої колонки
+                headers.splice(1, 0, 'data_sort');
+                
                 const columns = [];
                 const totalHeaderCount = headers.length; 
                 
@@ -282,7 +311,13 @@
                     if (title === 'name') { 
                         title = 'Clip Name';
                         visible = true; 
-                    } else if (title === 'data') {
+                    } else if (title === 'data_sort') {
+                        // ПРИХОВАНА КОЛОНКА СОРТУВАННЯ (ІНДЕКС 1)
+                        title = 'Дата сортування'; 
+                        visible = false; 
+                    }
+                    else if (title === 'data') {
+                        // ВИДИМА КОЛОНКА ДАТИ (ІНДЕКС 2)
                         title = 'Дата';
                         visible = true; 
                     } else if (title === 'link') {
@@ -313,6 +348,8 @@
                     dom: 'tr p', 
                     scrollX: true,
                     processing: true,
+                    
+                    // ВСТАНОВЛЮЄМО ПОЧАТКОВЕ СОРТУВАННЯ ЗА ПРИХОВАНОЮ КОЛОНКОЮ (ІНДЕКС 1), СПАДАННЯМ (desc)
                     order: [[1, 'desc']], 
 
                     pageLength: 50, 
@@ -322,14 +359,16 @@
                     ],
 
                     columnDefs: [
+                         // ГАРАНТОВАНО ВИМИКАЄМО СОРТУВАННЯ НА ВИДИМІЙ КОЛОНЦІ "ДАТА" (ІНДЕКС 2)
+                         { targets: 2, orderable: false, className: 'dt-center' }, 
+                         
                          { targets: 0, className: 'dt-left' }, 
-                         { targets: 1, className: 'dt-center' }, 
-                         { targets: 2, className: 'dt-center' } 
+                         { targets: 3, className: 'dt-center' } // Links
                     ]
                 });
 
-                // Ініціалізація фільтра авторів з динамічним діапазоном
-                addCombinedAuthorFilter(dataTable, 3, lastAuthorIndex); 
+                // Фільтр авторів починається з індексу 4
+                addCombinedAuthorFilter(dataTable, 4, lastAuthorIndex); 
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
                 let errorMessage = "КРИТИЧНА ПОМИЛКА! Перевірте: 1) Роботу Python-сервера. 2) Файл 'my_data.csv' використовує ';' як роздільник.";
