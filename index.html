@@ -76,6 +76,16 @@
              cursor: default !important;
         }
         /* ===================================================================================== */
+        
+        /* === НОВЕ: ПРИБИРАННЯ СОРТУВАЛЬНИХ ІКОНОК З КОЛОНКИ "LINKS" (ІНДЕКС 3) === */
+        #myDataTable thead th:nth-child(4)::after, 
+        #myDataTable thead th:nth-child(4)::before {
+            display: none !important;
+        }
+        #myDataTable thead th:nth-child(4) {
+             cursor: default !important;
+        }
+        /* ======================================================================== */
 
 
         /* === СТИЛІ КНОПКИ YOUTUBE === */
@@ -359,11 +369,13 @@
                     ],
 
                     columnDefs: [
-                         // ГАРАНТОВАНО ВИМИКАЄМО СОРТУВАННЯ НА ВИДИМІЙ КОЛОНЦІ "ДАТА" (ІНДЕКС 2)
+                         // ВИМИКАЄМО СОРТУВАННЯ НА ВИДИМІЙ КОЛОНЦІ "ДАТА" (ІНДЕКС 2)
                          { targets: 2, orderable: false, className: 'dt-center' }, 
                          
-                         { targets: 0, className: 'dt-left' }, 
-                         { targets: 3, className: 'dt-center' } // Links
+                         // ВИМИКАЄМО СОРТУВАННЯ НА КОЛОНЦІ "LINKS" (ІНДЕКС 3)
+                         { targets: 3, orderable: false, className: 'dt-center' }, 
+                         
+                         { targets: 0, className: 'dt-left' } // Clip Name
                     ]
                 });
 
