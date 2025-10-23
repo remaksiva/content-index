@@ -123,9 +123,6 @@
              padding-top: 10px !important;
         }
         
-        /* Усі правила центрування та кастомного кольору пагінації ВИДАЛЕНО */
-
-
         /* === СТИЛЬ ФУТЕРА (ПОДЯКА) === */
         .footer-thanks {
             margin-top: 40px; 
@@ -213,7 +210,7 @@
                 .appendTo(container);
             
             uniqueAuthors.forEach(function(author) {
-                const display = author.length > 100 ? author.substring(0, 100) + '...' : author;
+                const display = author.length > 50 ? author.substring(0, 50) + '...' : author;
                 select.append('<option value="' + author + '">' + display + '</option>');
             });
 
@@ -221,14 +218,15 @@
                 const searchValue = $(this).val();
 
                 if (searchValue) {
-                    table.search(searchValue, false, true, false).draw();
+                    // Використовуємо глобальний пошук DataTables
+                    // Дозволяє знайти значення у будь-якій колонці
+                    table.search(searchValue).draw();
                 } else {
-                    table.search('', false, false, false).draw();
+                    // Скидаємо глобальний пошук
+                    table.search('').draw();
                 }
             });
         }
-
-        // Прибираємо функцію applyCustomPaginationStyles, оскільки вона більше не потрібна
 
         $(document).ready(function() {
             
@@ -247,18 +245,36 @@
                 const headers = rows[0].split(separator); 
                 const tableData = [];
                 
+                // === ДИНАМІЧНИЙ ПОШУК ІНДЕКСУ ОСТАННЬОГО АВТОРА ===
+                let lastAuthorIndex = 2; 
+                
+                for (let i = 3; i < headers.length; i++) {
+                    // Перевіряємо, чи заголовок починається з 'author'
+                    if (headers[i].trim().startsWith('author')) {
+                        lastAuthorIndex = i;
+                    }
+                }
+                // ===================================================
+
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i].split(separator); 
+                    // Тут було виправлення, яке прибирало останній елемент, 
+                    // якщо їх було більше 23, залишаємо це як є, але врахуємо, 
+                    // що якщо кількість авторів змінилася, цей рядок може потребувати уваги.
+                    // Наразі припускаємо, що це все ще актуально, або його можна прибрати.
                     if (row.length > 23) {
-                        row.pop(); 
+                         // Робимо більш динамічним, якщо це можливо:
+                         if (row.length > headers.length) {
+                             row.pop(); 
+                         }
                     }
                     tableData.push(row); 
                 }
 
                 const columns = [];
-                const finalHeaderCount = headers.length - 1; 
+                const totalHeaderCount = headers.length; 
                 
-                for (let i = 0; i < finalHeaderCount; i++) {
+                for (let i = 0; i < totalHeaderCount; i++) { 
                     let title = headers[i].trim();
                     let dataIndex = i;
                     let visible = false; 
@@ -312,9 +328,8 @@
                     ]
                 });
 
-                // Видаляємо всі виклики applyCustomPaginationStyles
-                
-                addCombinedAuthorFilter(dataTable, 3, 22); 
+                // Ініціалізація фільтра авторів з динамічним діапазоном
+                addCombinedAuthorFilter(dataTable, 3, lastAuthorIndex); 
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
                 let errorMessage = "КРИТИЧНА ПОМИЛКА! Перевірте: 1) Роботу Python-сервера. 2) Файл 'my_data.csv' використовує ';' як роздільник.";
