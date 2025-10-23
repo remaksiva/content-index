@@ -37,6 +37,22 @@
             color: white; 
             text-align: center !important; 
         }
+
+        /* === ДОДАНО: СТИЛІ КНОПКИ YOUTUBE ТА ВЕРТИКАЛЬНОГО ЦЕНТРУВАННЯ === */
+        .btn-youtube {
+            color: white !important;
+            background-color: #ff0000 !important; /* Червоний колір YouTube */
+            border-color: #ff0000 !important;
+        }
+        .btn-youtube:hover {
+            background-color: #cc0000 !important; 
+            border-color: #cc0000 !important;
+        }
+
+        #myDataTable tbody td {
+            vertical-align: middle !important; /* КЛЮЧ: Вертикальне центрування вмісту комірок */
+        }
+        /* ================================================================= */
         
         /* === Стилі для фільтра (ПК) === */
         #filterContainer { 
@@ -54,6 +70,8 @@
             margin: 5px 0; 
             width: 350px; 
             max-width: 90%;
+            height: auto; 
+            box-sizing: border-box; 
         }
 
         /* === Гарантоване Центрування Пагінації (Flexbox) === */
@@ -68,27 +86,28 @@
         }
 
         /* ========================================================= */
-        /* ФІНАЛЬНА ЗМІНА: АГРЕСИВНИЙ МЕДІА-ЗАПИТ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ */
+        /* АГРЕСИВНИЙ МЕДІА-ЗАПИТ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ */
         /* ========================================================= */
         @media (max-width: 992px) {
             
             /* 1. ВИПАДАЮЧЕ МЕНЮ */
             #filterContainer select {
-                font-size: 1.8em !important; /* Дуже великий шрифт */
+                font-size: 1.8em !important; 
                 padding: 12px 20px !important; 
+                max-width: 95% !important; 
+                width: 100% !important;
             }
 
             /* 2. ЗАГОЛОВКИ ТА ДАНІ ТАБЛИЦІ */
             #myDataTable thead th,
             #myDataTable tbody td {
-                font-size: 1.6em !important; /* Дуже великий шрифт */
+                font-size: 1.6em !important; 
             }
             
             /* 3. ПОСИЛАННЯ В ТАБЛИЦІ (Робимо кнопки мобільними) */
             #myDataTable tbody td a.btn {
                  font-size: 1.6em !important; 
-                 padding: 0.5rem 1rem !important; /* Збільшуємо зону натискання */
-                 /* Гарантуємо, що іконка виглядає добре */
+                 padding: 0.5rem 1rem !important; 
                  line-height: 1.5; 
             }
         }
@@ -200,11 +219,10 @@
                     let columnDef = { data: dataIndex, title: title, visible: visible };
                     
                     if (title === 'Links') {
-                        // КЛЮЧОВА ЗМІНА: Рендеринг у вигляді кнопки
+                        // КЛЮЧОВА ЗМІНА: Використовуємо клас 'btn-youtube'
                         columnDef.render = function(data, type, row) {
                              if (!data || type !== 'display') return data;
-                             // Використовуємо класи Bootstrap (btn, btn-primary, btn-sm) та іконку YouTube (fa-youtube)
-                             return '<a href="' + data + '" target="_blank" class="btn btn-primary btn-sm"><i class="fab fa-youtube"></i> YouTube Link</a>';
+                             return '<a href="' + data + '" target="_blank" class="btn btn-youtube btn-sm"><i class="fab fa-youtube"></i> YouTube Link</a>';
                         };
                         columnDef.className = 'dt-center'; 
                     }
