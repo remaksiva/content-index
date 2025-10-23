@@ -66,7 +66,6 @@
             border-top-right-radius: 8px !important;
         }
 
-
         /* === СТИЛІ КНОПКИ YOUTUBE === */
         .btn-youtube {
             color: white !important;
@@ -93,21 +92,16 @@
             text-align: center;
         }
         
-        /* --- НОВІ СТИЛІ ДЛЯ СЕЛЕКТА --- */
+        /* --- СТИЛІ ДЛЯ СЕЛЕКТА --- */
         #filterContainer select {
             -webkit-appearance: none; 
             -moz-appearance: none;    
             appearance: none;         
-            
-            /* ПРИБИРАЄМО СТРІЛКУ BOOTSTRAP */
             background-image: none !important; 
-            
             padding-left: 15px !important; 
             padding-right: 15px !important; 
-            
-            text-align-last: center; /* Центруємо текст */
+            text-align-last: center; 
             text-align: center;      
-            
             font-size: 1.1em; 
             padding-top: 8px; 
             padding-bottom: 8px;
@@ -120,29 +114,16 @@
         }
         
         /* ================================================= */
-        /* === СТИЛІ ПАГІНАЦІЇ (ЧЕРЕЗ DATA TABLES ОБГОРТКИ) === */
+        /* === СТИЛІ ПАГІНАЦІЇ: ТІЛЬКИ ВІДСТУП === */
         /* ================================================= */
 
-        /* 1. ВІДСТУП ТА ЦЕНТРУВАННЯ БАТЬКІВСЬКОГО РЯДКА */
-        /* Це елемент div.row, що містить і "записи на сторінці", і пагінацію */
+        /* Додаємо відступ до рядка, що містить пагінацію */
         .dataTables_wrapper .row:last-child {
              margin-top: 25px !important; 
              padding-top: 10px !important;
         }
         
-        /* 2. ЦЕНТРУВАННЯ ОБГОРТКИ ПАГІНАЦІЇ (div.dataTables_paginate) */
-        /* Це обгортка, яка містить ul.pagination. Застосовуємо до неї Flexbox. */
-        .dataTables_wrapper .dataTables_paginate {
-             /* Робимо цю обгортку Flex-контейнером */
-             display: flex !important; 
-             /* Центруємо її вміст (тобто ul.pagination) */
-             justify-content: center !important; 
-        }
-
-        /* 3. ДОДАТКОВЕ ЦЕНТРУВАННЯ САМОГО UL (для гарантії) */
-        .dataTables_wrapper .dataTables_paginate ul.pagination {
-             justify-content: center !important; 
-        }
+        /* Усі правила центрування та кастомного кольору пагінації ВИДАЛЕНО */
 
 
         /* === СТИЛЬ ФУТЕРА (ПОДЯКА) === */
@@ -228,7 +209,6 @@
                 .map(a => a.toString().trim())
                 .sort((a, b) => a.localeCompare(b, 'uk', { sensitivity: 'base' })); 
 
-            // СТВОРЕННЯ SELECT: ▼    push me    ▲ (Заповнені трикутники, 4 пробіли)
             const select = $('<select id="authorFilterSelect" class="form-select"><option value="">\u25bc&nbsp;&nbsp;&nbsp;&nbsp;push me&nbsp;&nbsp;&nbsp;&nbsp;\u25b2</option></select>')
                 .appendTo(container);
             
@@ -248,6 +228,7 @@
             });
         }
 
+        // Прибираємо функцію applyCustomPaginationStyles, оскільки вона більше не потрібна
 
         $(document).ready(function() {
             
@@ -331,9 +312,8 @@
                     ]
                 });
 
-                // >>> ВИДАЛЕНО: $('#myDataTable_paginate ul.pagination').addClass('d-flex justify-content-center'); <<<
-
-                // Ініціалізація фільтра авторів
+                // Видаляємо всі виклики applyCustomPaginationStyles
+                
                 addCombinedAuthorFilter(dataTable, 3, 22); 
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
