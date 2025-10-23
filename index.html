@@ -17,13 +17,11 @@
         }
         
         .container { 
-            /* 100px зверху для зміщення, автоматичне центрування, 20px знизу */
             margin: 100px auto 20px auto; 
-            
             max-width: 90%; 
             padding: 20px; 
             border-radius: 8px; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+            box-shadow: 0 0 20px rgba(204, 0, 105, 0.3); 
         }
         h1 { 
             color: #ffffff; 
@@ -39,7 +37,6 @@
             height: auto;
             border-radius: 50%; 
             border: 3px solid #375a7f; 
-            
             transition: opacity 0.2s;
             cursor: pointer; 
         }
@@ -54,9 +51,9 @@
             margin-bottom: 20px;
         }
 
-        /* === СТИЛЬ ЗАГОЛОВКІВ ТАБЛИЦІ (КОЛІР) === */
+        /* === СТИЛЬ ЗАГОЛОВКІВ ТАБЛИЦІ (КОЛІР: #33001a) === */
         table.dataTable thead th { 
-            background-color: #33001a !important; /* Фінальний колір: Темно-коричневий */
+            background-color: #33001a !important; 
             color: white; 
             text-align: center !important; 
         }
@@ -70,7 +67,7 @@
         }
 
 
-        /* === СТИЛІ КНОПКИ YOUTUBE (Червоний колір) === */
+        /* === СТИЛІ КНОПКИ YOUTUBE === */
         .btn-youtube {
             color: white !important;
             background-color: #cc0069 !important; 
@@ -84,6 +81,7 @@
         /* === ВЕРТИКАЛЬНЕ ЦЕНТРУВАННЯ ВМІСТУ КОМІРОК === */
         #myDataTable tbody td {
             vertical-align: middle !important; 
+            text-align: center !important; 
         }
         
         /* === Стилі для фільтра (ПК) === */
@@ -95,9 +93,24 @@
             text-align: center;
         }
         
-        #filterContainer select { 
+        /* --- НОВІ СТИЛІ ДЛЯ СЕЛЕКТА --- */
+        #filterContainer select {
+            -webkit-appearance: none; 
+            -moz-appearance: none;    
+            appearance: none;         
+            
+            /* ПРИБИРАЄМО СТРІЛКУ BOOTSTRAP */
+            background-image: none !important; 
+            
+            padding-left: 15px !important; 
+            padding-right: 15px !important; 
+            
+            text-align-last: center; /* Центруємо текст */
+            text-align: center;      
+            
             font-size: 1.1em; 
-            padding: 8px 15px; 
+            padding-top: 8px; 
+            padding-bottom: 8px;
             border-radius: 6px; 
             margin: 5px 0; 
             width: 350px; 
@@ -105,18 +118,33 @@
             height: auto; 
             box-sizing: border-box; 
         }
+        
+        /* ================================================= */
+        /* === СТИЛІ ПАГІНАЦІЇ (ЧЕРЕЗ DATA TABLES ОБГОРТКИ) === */
+        /* ================================================= */
 
-        /* === Гарантоване Центрування Пагінації === */
-        .dataTables_wrapper .row:last-child div:last-child {
-             text-align: center !important;
-        }
-        .dataTables_wrapper .dataTables_paginate ul.pagination {
-             justify-content: center !important; 
-             width: 100% !important; 
-             float: none !important;
-             display: flex !important;
+        /* 1. ВІДСТУП ТА ЦЕНТРУВАННЯ БАТЬКІВСЬКОГО РЯДКА */
+        /* Це елемент div.row, що містить і "записи на сторінці", і пагінацію */
+        .dataTables_wrapper .row:last-child {
+             margin-top: 25px !important; 
+             padding-top: 10px !important;
         }
         
+        /* 2. ЦЕНТРУВАННЯ ОБГОРТКИ ПАГІНАЦІЇ (div.dataTables_paginate) */
+        /* Це обгортка, яка містить ul.pagination. Застосовуємо до неї Flexbox. */
+        .dataTables_wrapper .dataTables_paginate {
+             /* Робимо цю обгортку Flex-контейнером */
+             display: flex !important; 
+             /* Центруємо її вміст (тобто ul.pagination) */
+             justify-content: center !important; 
+        }
+
+        /* 3. ДОДАТКОВЕ ЦЕНТРУВАННЯ САМОГО UL (для гарантії) */
+        .dataTables_wrapper .dataTables_paginate ul.pagination {
+             justify-content: center !important; 
+        }
+
+
         /* === СТИЛЬ ФУТЕРА (ПОДЯКА) === */
         .footer-thanks {
             margin-top: 40px; 
@@ -131,17 +159,14 @@
         /* ========================================================= */
         @media (max-width: 992px) {
             
-            /* ЛОГОТИП НА МОБІЛЬНОМУ */
-            #logo-image {
-                max-width: 100px; 
-            }
-
             /* 1. ВИПАДАЮЧЕ МЕНЮ (збільшення) */
             #filterContainer select {
                 font-size: 1.8em !important; 
                 padding: 12px 20px !important; 
                 max-width: 95% !important; 
                 width: 100% !important;
+                padding-left: 20px !important; 
+                padding-right: 20px !important;
             }
 
             /* 2. ЗАГОЛОВКИ ТА ДАНІ ТАБЛИЦІ (збільшення) */
@@ -179,6 +204,7 @@
             <tbody>
             </tbody>
         </table>
+
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -202,9 +228,10 @@
                 .map(a => a.toString().trim())
                 .sort((a, b) => a.localeCompare(b, 'uk', { sensitivity: 'base' })); 
 
-            const select = $('<select id="authorFilterSelect" class="form-select"><option value="">Filter by Author (All)</option></select>')
+            // СТВОРЕННЯ SELECT: ▼    push me    ▲ (Заповнені трикутники, 4 пробіли)
+            const select = $('<select id="authorFilterSelect" class="form-select"><option value="">\u25bc&nbsp;&nbsp;&nbsp;&nbsp;push me&nbsp;&nbsp;&nbsp;&nbsp;\u25b2</option></select>')
                 .appendTo(container);
-
+            
             uniqueAuthors.forEach(function(author) {
                 const display = author.length > 50 ? author.substring(0, 50) + '...' : author;
                 select.append('<option value="' + author + '">' + display + '</option>');
@@ -260,7 +287,7 @@
                         visible = true; 
                     } else if (title === 'data') {
                         title = 'Дата';
-                        visible = false; 
+                        visible = true; 
                     } else if (title === 'link') {
                         title = 'Links';
                         visible = true; 
@@ -272,7 +299,6 @@
                     let columnDef = { data: dataIndex, title: title, visible: visible };
                     
                     if (title === 'Links') {
-                        // РЕНДЕР: Червона кнопка "YouTube"
                         columnDef.render = function(data, type, row) {
                              if (!data || type !== 'display') return data;
                              return '<a href="' + data + '" target="_blank" class="btn btn-youtube btn-sm"><i class="fab fa-youtube"></i> YouTube</a>';
@@ -290,7 +316,7 @@
                     dom: 'tr p', 
                     scrollX: true,
                     processing: true,
-                    ordering: false, 
+                    order: [[1, 'desc']], 
 
                     pageLength: 50, 
                     lengthMenu: [ 
@@ -299,10 +325,13 @@
                     ],
 
                     columnDefs: [
-                         { targets: 0, className: 'dt-center' }, 
+                         { targets: 0, className: 'dt-left' }, 
+                         { targets: 1, className: 'dt-center' }, 
                          { targets: 2, className: 'dt-center' } 
                     ]
                 });
+
+                // >>> ВИДАЛЕНО: $('#myDataTable_paginate ul.pagination').addClass('d-flex justify-content-center'); <<<
 
                 // Ініціалізація фільтра авторів
                 addCombinedAuthorFilter(dataTable, 3, 22); 
@@ -314,18 +343,18 @@
         });
     </script>
     
-<footer class="text-center footer-thanks">
-    <p>
-        The <a href="https://www.youtube.com/@remaksiva" target="_blank" class="text-info">Remaksiva</a> Project sincerely thanks:
-        <br>
-        The 
-        <a href="https://www.pexels.com/" target="_blank" class="text-info">Pexels</a> 
-        community and all authors for the provided photo and video materials. 
-        <br>
-        As well as the 
-        <a href="https://www.youtube.com/" target="_blank" class="text-info">YouTube</a> 
-        platform for the opportunity to share video content.
-    </p>
-</footer>
+    <footer class="text-center footer-thanks">
+        <p>
+            The <a href="https://www.youtube.com/@remaksiva" target="_blank" class="text-info">Remaksiva</a> Project sincerely thanks:
+            <br>
+            The 
+            <a href="https://www.pexels.com/" target="_blank" class="text-info">Pexels</a> 
+            community and all authors for the provided photo and video materials. 
+            <br>
+            As well as the 
+            <a href="https://www.youtube.com/" target="_blank" class="text-info">YouTube</a> 
+            platform for the opportunity to share video content.
+        </p>
+    </footer>
 </body>
 </html>
