@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Інтерактивний Фільтр Даних (ТЕМА DARKLY, ФІНАЛ)</title>
+    <title>Інтерактивний Фільтр Даних (ТЕМА DARKLY, ЗМІЩЕННЯ ВНИЗ, ЛОКАЛЬНО)</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css">
@@ -14,9 +14,12 @@
             margin: 20px; 
             background-color: #222; 
         }
+        
         .container { 
+            /* 100px зверху, автоматичне центрування по горизонталі, 20px знизу */
+            margin: 100px auto 20px auto; 
+            
             max-width: 90%; 
-            margin: 0 auto; 
             padding: 20px; 
             border-radius: 8px; 
             box-shadow: 0 0 10px rgba(0,0,0,0.5); 
@@ -43,6 +46,7 @@
             text-align: center;
         }
         
+        /* Шрифт для випадаючого меню на ПК */
         #filterContainer select { 
             font-size: 1.1em; 
             padding: 8px 15px; 
@@ -53,22 +57,42 @@
         }
 
         /* === Гарантоване Центрування Пагінації (Flexbox) === */
-        /* Націлюємося на контейнер, що містить кнопки пагінації */
         .dataTables_wrapper .row:last-child div:last-child {
              text-align: center !important;
         }
-        /* Націлюємося на сам елемент UL для Flexbox-центрування */
         .dataTables_wrapper .dataTables_paginate ul.pagination {
              justify-content: center !important; 
              width: 100% !important; 
              float: none !important;
              display: flex !important;
         }
+
+        /* ========================================================= */
+        /* КЛЮЧОВА ЗМІНА: МЕДІА-ЗАПИТ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ (до 992px) */
+        /* ========================================================= */
+        @media (max-width: 992px) {
+            /* Збільшуємо шрифт для випадаючого меню */
+            #filterContainer select {
+                font-size: 1.3em; 
+                padding: 10px 18px; /* Збільшуємо і падінги */
+            }
+
+            /* Збільшуємо шрифт для заголовків та даних таблиці */
+            #myDataTable thead th,
+            #myDataTable tbody td {
+                font-size: 1.1em; /* Зазвичай на 10-20% більше, ніж стандартний */
+            }
+            
+            /* Робимо посилання в таблиці більшими, щоб було легше натискати */
+            #myDataTable tbody td a {
+                 font-size: 1.1em;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Пошук та Фільтрація Даних</h1>
+        <h1>Video Link (with Author Media)</h1>
         
         <div id="filterContainer"></div>
 
@@ -87,11 +111,9 @@
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
     
     <script>
-        // Функція для створення фільтра, що об'єднує багато колонок
         function addCombinedAuthorFilter(table, startColumnIndex, endColumnIndex) {
             const container = $('#filterContainer');
             
-            // 1. Збір усіх унікальних авторів
             let authors = [];
             
             for (let i = startColumnIndex; i <= endColumnIndex; i++) {
@@ -99,31 +121,25 @@
                 authors = authors.concat(columnData);
             }
 
-            // Очищення, отримання унікальних значень та АЛФАВІТНЕ СОРТУВАННЯ
             const uniqueAuthors = [...new Set(authors)]
                 .filter(a => a && a.toString().trim() !== '')
                 .map(a => a.toString().trim())
                 .sort((a, b) => a.localeCompare(b, 'uk', { sensitivity: 'base' })); 
 
-            // 2. Створення елемента Select (з класом Bootstrap 'form-select')
-            const select = $('<select id="authorFilterSelect" class="form-select"><option value="">Фільтр за Автором (Всі)</option></select>')
+            const select = $('<select id="authorFilterSelect" class="form-select"><option value="">Filter by Author (All)</option></select>')
                 .appendTo(container);
 
-            // 3. Заповнення опцій
             uniqueAuthors.forEach(function(author) {
                 const display = author.length > 50 ? author.substring(0, 50) + '...' : author;
                 select.append('<option value="' + author + '">' + display + '</option>');
             });
 
-            // 4. Обробка події OnChange
             select.on('change', function() {
                 const searchValue = $(this).val();
 
                 if (searchValue) {
-                    // Фільтруємо таблицю
                     table.search(searchValue, false, true, false).draw();
                 } else {
-                    // Скидаємо фільтр
                     table.search('', false, false, false).draw();
                 }
             });
@@ -136,12 +152,10 @@
             
             $.get(csvFilePath, function(data) {
                 
-                // --- РУЧНИЙ ПАРСИНГ ---
                 const separator = ';'; 
                 const rows = data.replace(/"/g, '').split('\n').filter(row => row.trim() !== ''); 
                 
                 if (rows.length < 2) {
-                    // Виведення повідомлення про помилку за допомогою стилів Bootstrap
                     $('#myDataTable').html('<div class="alert alert-warning text-center">Помилка: Файл CSV порожній.</div>');
                     return;
                 }
@@ -151,7 +165,6 @@
                 
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i].split(separator); 
-                    // Видаляємо останню комірку (author23) з рядка даних
                     if (row.length > 23) {
                         row.pop(); 
                     }
@@ -161,30 +174,28 @@
                 const columns = [];
                 const finalHeaderCount = headers.length - 1; 
                 
-                // Створення визначень колонок (тільки name, data, link, authors)
                 for (let i = 0; i < finalHeaderCount; i++) {
                     let title = headers[i].trim();
                     let dataIndex = i;
-                    let visible = false; // За замовчуванням - приховано
+                    let visible = false; 
 
                     if (title === 'name') { 
-                        title = 'Назва кліпу';
-                        visible = true; // Видима
+                        title = 'Clip Name';
+                        visible = true; 
                     } else if (title === 'data') {
                         title = 'Дата';
-                        visible = false; // Прихована
+                        visible = false; 
                     } else if (title === 'link') {
-                        title = 'Посилання';
-                        visible = true; // Видима
+                        title = 'Links';
+                        visible = true; 
                     } else if (title.startsWith('author')) {
                         title = title.replace('author', 'Автор');
-                        visible = false; // Прихована
+                        visible = false; 
                     }
                     
                     let columnDef = { data: dataIndex, title: title, visible: visible };
                     
-                    if (title === 'Посилання') {
-                        // Рендеринг для створення гіперпосилання
+                    if (title === 'Links') {
                         columnDef.render = function(data, type, row) {
                              if (!data || type !== 'display') return data;
                              return '<a href="' + data + '" target="_blank">' + data + '</a>';
@@ -195,16 +206,14 @@
                     columns.push(columnDef);
                 }
                 
-                // --- ІНІЦІАЛІІЗАЦІЯ DATATABLES ---
                 const dataTable = $('#myDataTable').DataTable({
                     data: tableData,
                     columns: columns, 
                     
-                    // dom: 'tr p' - тільки таблиця, рядок (processing) і пагінація
                     dom: 'tr p', 
                     scrollX: true,
                     processing: true,
-                    ordering: false, // Вимкнення сортування (прибирає стрілочки)
+                    ordering: false, 
 
                     pageLength: 50, 
                     lengthMenu: [ 
@@ -213,16 +222,11 @@
                     ],
 
                     columnDefs: [
-                         // Центруємо Назву кліпу (індекс 0)
                          { targets: 0, className: 'dt-center' }, 
-                         
-                         // Центруємо Посилання (індекс 2)
                          { targets: 2, className: 'dt-center' } 
                     ]
                 });
 
-                // !!! ДОДАВАННЯ ФІЛЬТРА АВТОРА !!!
-                // Колонки авторів, які використовуються для фільтрації: 3 до 22.
                 addCombinedAuthorFilter(dataTable, 3, 22); 
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
