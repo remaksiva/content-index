@@ -213,7 +213,7 @@
                 .appendTo(container);
             
             uniqueAuthors.forEach(function(author) {
-                const display = author.length > 50 ? author.substring(0, 50) + '...' : author;
+                const display = author.length > 100 ? author.substring(0, 100) + '...' : author;
                 select.append('<option value="' + author + '">' + display + '</option>');
             });
 
