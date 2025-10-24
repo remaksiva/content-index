@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>Інтерактивний Фільтр Даних (ТЕМА DARKLY, ФІНАЛ)</title>
     
+    <link rel="icon" type="image/png" href="favicon.png"> 
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMD/CDyD1vJcK/kM5Q3gBfH7v9tV+C2mE6z6F3tC8JmS8F6B2vL2C1W/Q6H5zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -23,13 +27,63 @@
             border-radius: 8px; 
             box-shadow: 0 0 20px rgba(204, 0, 105, 0.3); 
         }
+
+        /* === ФІНАЛЬНІ СТИЛІ ЗАГОЛОВКА H1 === */
         h1 { 
+            font-family: 'Montserrat', sans-serif; 
+            font-weight: 800; 
+            font-size: 2.8em; 
             color: #ffffff; 
-            margin-bottom: 25px; 
+            margin-bottom: 20px; 
             text-align: center; 
+            text-shadow: 2px 2px 6px rgba(204, 0, 105, 0.7); 
+            letter-spacing: 2px; 
+            padding-top: 10px; 
+        }
+        
+        /* === ФІНАЛЬНІ СТИЛІ АНГЛІЙСЬКИХ ПАРАГРАФІВ (ОСНОВНИЙ ТЕКСТ) === */
+        #subheading-thanks {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1em; 
+            font-weight: 600; 
+            color: #ccc; 
+            text-align: center;
+            margin-top: -15px;
+            margin-bottom: 5px; 
+        }
+        #subheading-value {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #ccc; 
+            text-align: center;
+            margin-bottom: 20px; 
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(204, 0, 105, 0.4); 
+            width: 80%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        /* === СТИЛІ КРУГЛОГО ЛОГОТИПУ === */
+        /* === ФІНАЛЬНІ СТИЛІ УКРАЇНСЬКИХ ПАРАГРАФІВ (ПІДСИЛЕННЯ) === */
+        #subheading-ua-thanks, #subheading-ua-value {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85em; 
+            font-style: italic; 
+            font-weight: 500; 
+            color: #999; 
+            text-align: center;
+            line-height: 1.2;
+            margin-top: 0px; 
+            margin-bottom: 3px; 
+        }
+        
+        #subheading-ua-value {
+            margin-bottom: 30px; 
+        }
+        
+        /* === ВІДНОВЛЕНІ СТИЛІ СТАТИЧНОГО ЛОГОТИПУ === */
         #logo-image {
             display: block; 
             margin: 0 auto 15px auto; 
@@ -40,7 +94,7 @@
             transition: opacity 0.2s;
             cursor: pointer; 
         }
-        
+
         #logo-image:hover {
             opacity: 0.8; 
         }
@@ -51,7 +105,7 @@
             margin-bottom: 20px;
         }
 
-        /* === СТИЛЬ ЗАГОЛОВКІВ ТАБЛИЦІ (КОЛІР: #33001a) === */
+        /* === СТИЛЬ ЗАГОЛОВКІВ ТАБЛИЦІ === */
         table.dataTable thead th { 
             background-color: #33001a !important; 
             color: white; 
@@ -66,18 +120,14 @@
             border-top-right-radius: 8px !important;
         }
         
-        /* === ГАРАНТОВАНЕ ПРИБИРАННЯ СОРТУВАЛЬНИХ ІКОНОК З ВИДИМОЇ КОЛОНКИ "ДАТА" (ІНДЕКС 2) === */
+        /* === ПРИБИРАННЯ СОРТУВАЛЬНИХ ІКОНОК (ДАТА та LINKS) === */
         #myDataTable thead th:nth-child(3)::after, 
         #myDataTable thead th:nth-child(3)::before {
             display: none !important;
         }
-        /* Прибираємо курсор "pointer" на цій колонці */
         #myDataTable thead th:nth-child(3) {
              cursor: default !important;
         }
-        /* ===================================================================================== */
-        
-        /* === НОВЕ: ПРИБИРАННЯ СОРТУВАЛЬНИХ ІКОНОК З КОЛОНКИ "LINKS" (ІНДЕКС 3) === */
         #myDataTable thead th:nth-child(4)::after, 
         #myDataTable thead th:nth-child(4)::before {
             display: none !important;
@@ -85,7 +135,6 @@
         #myDataTable thead th:nth-child(4) {
              cursor: default !important;
         }
-        /* ======================================================================== */
 
 
         /* === СТИЛІ КНОПКИ YOUTUBE === */
@@ -105,7 +154,7 @@
             text-align: center !important; 
         }
         
-        /* === Стилі для фільтра (ПК) === */
+        /* === Стилі для фільтра === */
         #filterContainer { 
             margin-bottom: 25px; 
             display: flex;
@@ -135,11 +184,7 @@
             box-sizing: border-box; 
         }
         
-        /* ================================================= */
         /* === СТИЛІ ПАГІНАЦІЇ: ТІЛЬКИ ВІДСТУП === */
-        /* ================================================= */
-
-        /* Додаємо відступ до рядка, що містить пагінацію */
         .dataTables_wrapper .row:last-child {
              margin-top: 25px !important; 
              padding-top: 10px !important;
@@ -154,12 +199,8 @@
             border-top: 1px solid #333; 
         }
 
-        /* ========================================================= */
-        /* АГРЕСИВНИЙ МЕДІА-ЗАПИТ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ (< 992px) */
-        /* ========================================================= */
+        /* === МЕДІА-ЗАПИТ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ (< 992px) === */
         @media (max-width: 992px) {
-            
-            /* 1. ВИПАДАЮЧЕ МЕНЮ (збільшення) */
             #filterContainer select {
                 font-size: 1.8em !important; 
                 padding: 12px 20px !important; 
@@ -169,13 +210,11 @@
                 padding-right: 20px !important;
             }
 
-            /* 2. ЗАГОЛОВКИ ТА ДАНІ ТАБЛИЦІ (збільшення) */
             #myDataTable thead th,
             #myDataTable tbody td {
                 font-size: 1.6em !important; 
             }
             
-            /* 3. КНОПКИ В ТАБЛИЦІ (збільшення зони натискання) */
             #myDataTable tbody td a.btn {
                  font-size: 1.6em !important; 
                  padding: 0.5rem 1rem !important; 
@@ -193,7 +232,24 @@
              </a>
         </div>
         
-        <h1>AUTHOR MEDIA VIDEO LINKS</h1>
+        <h1>Remaksiva: Find Your Clip</h1>
+        
+        <p id="subheading-thanks">
+            With respect to the community, the REMAKSIVA project thanks the authors <br>
+            for their video and photo materials.
+        </p>
+
+        <p id="subheading-value">
+            Use this interactive index to check if Your works are featured here.
+        </p>
+        
+        <p id="subheading-ua-thanks">
+            З повагою до спільноти, проект REMAKSIVA дякує авторам за їхні відео- та фотоматеріали.
+        </p>
+
+        <p id="subheading-ua-value">
+            Скористайтеся цим інтерактивним індексом, щоб перевірити, чи є тут Ваші роботи.
+        </p>
         
         <div id="filterContainer"></div>
 
@@ -359,8 +415,8 @@
                     scrollX: true,
                     processing: true,
                     
-                    // ВСТАНОВЛЮЄМО ПОЧАТКОВЕ СОРТУВАННЯ ЗА ПРИХОВАНОЮ КОЛОНКОЮ (ІНДЕКС 1), СПАДАННЯМ (desc)
-                    order: [[1, 'desc']], 
+                    // СОРТУВАННЯ ЗА ПРИХОВАНОЮ КОЛОНКОЮ (ІНДЕКС 1) - ВІД НАЙСТАРІШОЇ ДАТИ
+                    order: [[1, 'asc']], 
 
                     pageLength: 50, 
                     lengthMenu: [ 
