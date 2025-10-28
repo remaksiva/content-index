@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     
     <style>
-        /* ВАШІ СТИЛІ */
+        /* БАЗОВІ СТИЛІ */
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #222; }
         .container { margin: 100px auto 20px auto; max-width: 90%; padding: 20px; border-radius: 8px; box-shadow: 0 0 20px rgba(204, 0, 105, 0.3); }
         h1 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 2.8em; color: #ffffff; margin-bottom: 20px; text-align: center; text-shadow: 2px 2px 6px rgba(204, 0, 105, 0.7); letter-spacing: 2px; padding-top: 10px; }
@@ -25,6 +25,8 @@
         #logo-image { display: block; margin: 0 auto 15px auto; max-width: 150px; height: auto; border-radius: 50%; border: 3px solid #375a7f; transition: opacity 0.2s; cursor: pointer; }
         #logo-image:hover { opacity: 0.8; }
         #channelButtonContainer { text-align: center; margin-bottom: 20px; }
+
+        /* СТИЛІ ТАБЛИЦІ */
         .styled-table {
             width: 100%;
             border-collapse: separate; 
@@ -39,12 +41,14 @@
             text-align: center !important; 
             padding: 12px 10px;
             border: none;
+            font-size: 1.0em;
         }
         .styled-table tbody td {
             border: 1px solid #333; 
             vertical-align: middle !important; 
             text-align: center !important; 
             padding: 10px;
+            font-size: 0.95em;
         }
         .styled-table tbody tr {
             background-color: #2a2a2a; 
@@ -52,20 +56,21 @@
         .styled-table tbody tr:nth-child(even) {
             background-color: #333; 
         }
-        /* Стиль для кнопки YouTube */
+        
+        /* КНОПКИ ТА ПОСИЛАННЯ */
         .styled-table tbody td a.btn-youtube {
             color: white !important;
             background-color: #cc0069 !important; 
             border-color: #cc0069 !important;
             padding: 5px 10px;
             display: inline-block;
+            font-size: 0.9em;
         }
         .styled-table tbody td a.btn-youtube:hover {
             background-color: #cc0000 !important; 
             border-color: #cc0000 !important;
         }
         
-        /* Стилі для кнопки Pexels */
         .styled-table tbody td a.btn-pexels {
             color: black !important;
             background-color: transparent !important; 
@@ -81,14 +86,12 @@
             transition: filter 0.2s ease-in-out, background-color 0.2s ease-in-out; 
         }
         
-        /* Затемнення іконки та легкий фон при наведенні */
         .styled-table tbody td a.btn-pexels:hover {
             background-color: rgba(8, 160, 128, 0.1) !important; 
             border-color: #08a080 !important; 
             filter: brightness(0.7); 
         }
 
-        /* Стиль для іконки Pexels всередині кнопки */
         .pexels-icon {
             height: 2.4em; 
             width: auto;
@@ -96,7 +99,6 @@
             border-radius: 10%; 
         }
         
-        /* Обмеження кількості кнопок у рядку */
         .pexels-links-container {
             max-width: 550px; 
             display: flex;
@@ -104,15 +106,8 @@
             justify-content: center; 
             margin: 0 auto;
         }
-        /* Стиль для імені автора */
-        .pexels-author-name {
-            display: block;
-            width: 100%; 
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #ddd;
-        }
 
+        /* ФІЛЬТР */
         #filterContainer { margin-bottom: 25px; display: flex; justify-content: center; align-items: center; text-align: center; }
         #filterContainer select {
             -webkit-appearance: none; -moz-appearance: none; appearance: none;
@@ -123,10 +118,46 @@
         }
         
         .footer-thanks { margin-top: 40px; padding: 20px 0; color: #ccc; font-size: 0.9em; border-top: 1px solid #333; }
+        
+        /* АДАПТИВНІСТЬ ДЛЯ МОБІЛЬНОЇ ВЕРСІЇ */
         @media (max-width: 992px) {
-            #filterContainer select { font-size: 1.8em !important; padding: 12px 20px !important; max-width: 95% !important; width: 100% !important; padding-left: 20px !important; padding-right: 20px !important; }
-            .styled-table thead th, .styled-table tbody td { font-size: 1.2em !important; }
-            .styled-table tbody td a.btn-youtube, .styled-table tbody td a.btn-pexels { font-size: 1.0em !important; padding: 0.5rem 1rem !important; line-height: 1.5; }
+            .container { max-width: 95%; padding: 10px; margin-top: 50px; }
+            h1 { font-size: 2.0em; }
+            #subheading-thanks, #subheading-value { font-size: 0.9em; }
+            #subheading-ua-thanks, #subheading-ua-value { font-size: 0.75em; }
+
+            /* Збільшуємо фільтр */
+            #filterContainer select { 
+                font-size: 1.3em !important; 
+                padding: 10px 15px !important; 
+                max-width: 95% !important; 
+                width: 100% !important; 
+            }
+
+            /* Збільшуємо текст у таблиці */
+            .styled-table thead th { 
+                font-size: 1.1em !important; 
+                padding: 8px 5px; 
+            }
+            .styled-table tbody td { 
+                font-size: 1.0em !important; 
+                padding: 8px 5px;
+            }
+
+            /* Збільшуємо кнопки */
+            .styled-table tbody td a.btn-youtube { 
+                font-size: 1.0em !important; 
+                padding: 0.4rem 0.8rem !important; 
+                line-height: 1.2; 
+            }
+            .styled-table tbody td a.btn-pexels { 
+                font-size: 1.0em !important; 
+                padding: 4px; 
+                margin: 3px;
+            }
+            .pexels-icon {
+                height: 2.8em; 
+            }
         }
     </style>
 </head>
@@ -218,13 +249,13 @@
                 Authors: Object.values(clip.Authors)
             }));
 
-            // 💡 1. СОРТУВАННЯ ЗА ДАТОЮ (ВІД НАЙНОВІШОГО ДО НАЙСТАРІШОГО)
+            // 💡 1. СОРТУВАННЯ КЛІПІВ ЗА ДАТОЮ (ВІД НАЙНОВІШОГО ДО НАЙСТАРІШОГО)
             result.sort((a, b) => {
-                // Перетворюємо DD.MM.YYYY на YYYYMMDD для коректного порівняння
+                // Припускаємо формат дати DD.MM.YYYY і перетворюємо його на YYYYMMDD для коректного порівняння
                 const dateA = a.Date.split('.').reverse().join(''); 
-                const dateB = b.Date.split('.').reverse().join(''); 
+                const dateB = b.Date.Date.split('.').reverse().join(''); 
                 
-                // Сортування за спаданням (зворотний хронологічний порядок)
+                // Сортування за спаданням
                 if (dateA > dateB) return -1;  
                 if (dateA < dateB) return 1;   
                 return 0;
@@ -234,16 +265,13 @@
             // 💡 2. ЛОГІКА ДЛЯ РЕЖИМУ "ВСІ АВТОРИ":
             if (!isFiltered) {
                 return result.map(clip => {
-                    // Збираємо імена авторів
                     const authorNames = clip.Authors.map(a => a.PexelsAuthor);
                     
                     // СОРТУВАННЯ АВТОРІВ ЗА АЛФАВІТОМ (Ігнорує регістр)
                     authorNames.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase(), 'uk', { sensitivity: 'base' })); 
                     
-                    // Об'єднуємо у рядок
                     const allAuthorsList = authorNames.join('<br>');
                     
-                    // Повертаємо кліп з консолідованим списком
                     return {
                         ...clip,
                         Authors: [{ PexelsAuthor: allAuthorsList, MediaItems: [] }]
@@ -251,18 +279,16 @@
                 });
             }
 
-            // Режим "Фільтр": Повертаємо відсортовану групу
             return result;
         }
 
         // ----------------------------------------------------
-        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ (Адаптивна логіка)
+        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ 
         // ----------------------------------------------------
         function renderTable(groupedData, isFiltered = false) {
             const table = document.getElementById(TABLE_ID);
             if (!table) return;
 
-            // 💡 АДАПТИВНИЙ ЗАГОЛОВОК
             let lastHeader = isFiltered ? 'Джерело Pexels' : 'Автор Pexels';
             let thead = '<thead><tr>';
             const headers = ['Назва Кліпу', 'Дата', 'Посилання на Кліп', lastHeader]; 
@@ -279,7 +305,6 @@
                 groupedData.forEach(clipGroup => {
                     if (clipGroup.Authors.length === 0) return; 
 
-                    // totalRows: 1 для режиму "Всі Автори", або кількість унікальних авторів для режиму "Фільтр"
                     const totalRows = clipGroup.Authors.length; 
                     const clipLinkHTML = `<a href="${clipGroup.ClipURL}" target="_blank" class="btn btn-youtube btn-sm"><i class="fab fa-youtube"></i> YouTube</a>`;
 
@@ -288,7 +313,6 @@
                         let finalContent = '';
                         
                         if (isFiltered) {
-                            // РЕЖИМ ФІЛЬТР (Показуємо кнопки)
                             let pexelsCellContent = '';
                             authorData.MediaItems.forEach(media => {
                                 pexelsCellContent += `<a href="${media.PexelsURL}" target="_blank" class="btn btn-pexels btn-sm">
@@ -297,14 +321,13 @@
                             });
                             finalContent = `<div class="pexels-links-container">${pexelsCellContent}</div>`;
                         } else {
-                            // РЕЖИМ ВСІ АВТОРИ (Показуємо об'єднані імена авторів - вирівняно по центру)
+                            // Режим "Всі автори" (відцентровано)
                             finalContent = `<div>${authorData.PexelsAuthor}</div>`;
                         }
 
                         tbody += `<tr class="clip-row">`;
 
-                        // ЛОГІКА ОБ'ЄДНАННЯ КОМІРОК (ROWSPAN)
-                        // Об'єднуємо Назву/Дату/Кліп лише для першого рядка групи (index === 0).
+                        // Об'єднання комірок за допомогою ROWSPAN
                         if (index === 0) { 
                             tbody += `
                                 <td rowspan="${totalRows}">${clipGroup.Name}</td>
@@ -313,7 +336,6 @@
                             `;
                         }
 
-                        // Адаптивний вміст останньої колонки
                         tbody += `
                             <td>${finalContent}</td>
                         </tr>`;
@@ -328,7 +350,7 @@
 
 
         // ----------------------------------------------------
-        // 3. ФУНКЦІЯ ФІЛЬТРАЦІЇ (Оновлений текст для "Всі автори")
+        // 3. ФУНКЦІЯ ФІЛЬТРАЦІЇ 
         // ----------------------------------------------------
         function setupAuthorFilter(data) { 
             const container = $('#' + FILTER_CONTAINER_ID);
@@ -337,10 +359,9 @@
             const uniqueAuthors = [...new Set(allAuthors)]
                 .filter(a => a && a.toString().trim() !== '')
                 .map(a => a.toString().trim())
-                // Сортування авторів у фільтрі також за алфавітом
                 .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase(), 'uk', { sensitivity: 'base' })); 
 
-            // 💡 ОНОВЛЕНИЙ ТЕКСТ: "push me"
+            // 💡 ОНОВЛЕННЯ ТЕКСТУ ФІЛЬТРА: "push me"
             const select = $('<select id="authorFilterSelect" class="form-select"><option value="">\u25bc&nbsp;&nbsp;&nbsp;&nbsp;push me&nbsp;&nbsp;&nbsp;&nbsp;\u25b2</option></select>')
                 .appendTo(container);
             
@@ -357,7 +378,7 @@
 
                 if (selectedAuthor) {
                     filteredData = fullValidData.filter(row => row.Pexels_Author === selectedAuthor);
-                    isFiltered = true; // Активуємо режим "Фільтр"
+                    isFiltered = true;
                 }
                 
                 const grouped = groupDataByClip(filteredData, isFiltered); 
@@ -367,7 +388,7 @@
 
 
         // ----------------------------------------------------
-        // 4. ОСНОВНИЙ БЛОК ВИКОНАННЯ (PapaParse)
+        // 4. ОСНОВНИЙ БЛОК ВИКОНАННЯ 
         // ----------------------------------------------------
         $(document).ready(function() {
             Papa.parse(CSV_FILE_PATH, {
