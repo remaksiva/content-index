@@ -71,35 +71,26 @@
             border-color: #cc0000 !important;
         }
         
-        /* Посилання Pexels (ДЕКСТОП) */
+        /* 💡 ОНОВЛЕНІ СТИЛІ КНОПКИ PEXELS (ТЕКСТ) - ДЕСКТОП */
         .styled-table tbody td a.btn-pexels {
-            color: black !important;
+            color: white !important; 
             background-color: transparent !important; 
-            border: 1px solid #08a080 !important;    
-            border-radius: 10% !important;           
-            padding: 2px; 
+            border: 2px solid #08a080 !important; /* Зелена обводка */
+            border-radius: 6px !important;           
+            padding: 5px 10px; 
             margin: 2px;
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 0.85em; 
+            display: inline-block; 
+            font-size: 0.9em; 
+            font-style: italic; /* Курсив */
             white-space: nowrap; 
-            transition: filter 0.2s ease-in-out, background-color 0.2s ease-in-out; 
+            transition: background-color 0.2s ease-in-out; 
         }
         
         .styled-table tbody td a.btn-pexels:hover {
-            background-color: rgba(8, 160, 128, 0.1) !important; 
+            background-color: rgba(8, 160, 128, 0.2) !important; 
             border-color: #08a080 !important; 
-            filter: brightness(0.7); 
         }
 
-        .pexels-icon {
-            height: 2.4em; 
-            width: auto;
-            vertical-align: middle;
-            border-radius: 10%; 
-        }
-        
         /* КОНТЕЙНЕР ДЖЕРЕЛ (ДЕКСТОП: горизонтально) */
         .pexels-links-container {
             max-width: 550px; 
@@ -157,14 +148,14 @@
                 line-height: 1.3; 
             }
             
-            /* 5. ЗНАЧНЕ ЗМЕНШЕННЯ КНОПКИ PEXELS */
+            /* 5. НОВА КНОПКА PEXELS (РОЗМІР ЯК У YOUTUBE, ТЕКСТ) */
             .styled-table tbody td a.btn-pexels { 
-                font-size: 0.5em !important; 
-                padding: 3px; 
-                margin: 4px; 
-            }
-            .pexels-icon {
-                height: 1.5em; 
+                font-size: 1.2em !important; /* Розмір як у YouTube */
+                padding: 0.6rem 1.1rem !important; 
+                margin: 6px; 
+                display: block; 
+                width: 80%; 
+                max-width: 150px; 
             }
 
             /* НОВА ЛОГІКА ДЛЯ SOURCE (ВЕРТИКАЛЬНО) */
@@ -174,12 +165,6 @@
                 align-items: center; 
                 max-width: 100%;
                 margin: 0;
-            }
-            
-            .styled-table tbody td a.btn-pexels {
-                display: block; 
-                width: 60%; 
-                max-width: 100px; 
             }
             
             .footer-thanks { font-size: 1.2em; }
@@ -346,8 +331,9 @@
                         if (isFiltered) {
                             let pexelsCellContent = '';
                             authorData.MediaItems.forEach(media => {
+                                // 💡 ЗМІНА: ТЕКСТОВА КНОПКА Pexels
                                 pexelsCellContent += `<a href="${media.PexelsURL}" target="_blank" class="btn btn-pexels btn-sm">
-                                    <img src="pexels_icon.png" alt="Pexels" class="pexels-icon">
+                                    pexels
                                 </a>`;
                             });
                             finalContent = `<div class="pexels-links-container">${pexelsCellContent}</div>`;
