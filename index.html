@@ -253,7 +253,7 @@
             result.sort((a, b) => {
                 // Припускаємо формат дати DD.MM.YYYY і перетворюємо його на YYYYMMDD для коректного порівняння
                 const dateA = a.Date.split('.').reverse().join(''); 
-                const dateB = b.Date.Date.split('.').reverse().join(''); 
+                const dateB = b.Date.split('.').reverse().join(''); 
                 
                 // Сортування за спаданням
                 if (dateA > dateB) return -1;  
@@ -283,15 +283,17 @@
         }
 
         // ----------------------------------------------------
-        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ 
+        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ (Оновлені заголовки)
         // ----------------------------------------------------
         function renderTable(groupedData, isFiltered = false) {
             const table = document.getElementById(TABLE_ID);
             if (!table) return;
 
-            let lastHeader = isFiltered ? 'Джерело Pexels' : 'Автор Pexels';
+            // 💡 ОНОВЛЕННЯ ЗАГОЛОВКІВ НА АНГЛІЙСЬКУ
+            let lastHeader = isFiltered ? 'Source' : 'Authors'; // Source у режимі фільтра, Authors у режимі "Всі"
             let thead = '<thead><tr>';
-            const headers = ['Назва Кліпу', 'Дата', 'Посилання на Кліп', lastHeader]; 
+            // Clip Name | Date | YouTube | Authors/Source
+            const headers = ['Clip Name', 'Date', 'YouTube', lastHeader]; 
             headers.forEach(h => {
                 thead += `<th>${h}</th>`;
             });
@@ -300,7 +302,7 @@
             let tbody = '<tbody>';
             
             if (groupedData.length === 0) {
-                 tbody += '<tr><td colspan="4">Не знайдено записів.</td></tr>';
+                 tbody += '<tr><td colspan="4">No records found.</td></tr>';
             } else {
                 groupedData.forEach(clipGroup => {
                     if (clipGroup.Authors.length === 0) return; 
@@ -321,13 +323,11 @@
                             });
                             finalContent = `<div class="pexels-links-container">${pexelsCellContent}</div>`;
                         } else {
-                            // Режим "Всі автори" (відцентровано)
                             finalContent = `<div>${authorData.PexelsAuthor}</div>`;
                         }
 
                         tbody += `<tr class="clip-row">`;
 
-                        // Об'єднання комірок за допомогою ROWSPAN
                         if (index === 0) { 
                             tbody += `
                                 <td rowspan="${totalRows}">${clipGroup.Name}</td>
@@ -361,7 +361,7 @@
                 .map(a => a.toString().trim())
                 .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase(), 'uk', { sensitivity: 'base' })); 
 
-            // 💡 ОНОВЛЕННЯ ТЕКСТУ ФІЛЬТРА: "push me"
+            // Текст фільтра: "push me"
             const select = $('<select id="authorFilterSelect" class="form-select"><option value="">\u25bc&nbsp;&nbsp;&nbsp;&nbsp;push me&nbsp;&nbsp;&nbsp;&nbsp;\u25b2</option></select>')
                 .appendTo(container);
             
@@ -398,25 +398,24 @@
                 delimiter: ';', 
                 complete: function(results) {
                     if (results.data.length === 0) {
-                        $('#' + TABLE_ID).html('<tbody><tr><td colspan="4" class="alert alert-warning text-center mt-4">Файл CSV завантажено, але він порожній або не містить коректних даних.</td></tr></tbody>');
+                        $('#' + TABLE_ID).html('<tbody><tr><td colspan="4" class="alert alert-warning text-center mt-4">CSV file loaded, but contains no data.</td></tr></tbody>');
                         return;
                     }
                     
                     fullValidData = results.data.filter(row => row.Pexels_ID && row.Status === 'OK');
                     
                     if (fullValidData.length === 0) {
-                        $('#' + TABLE_ID).html('<tbody><tr><td colspan="4">Не знайдено жодного підтвердженого медіа (Status=OK) для відображення.</td></tr></tbody>');
+                        $('#' + TABLE_ID).html('<tbody><tr><td colspan="4">No confirmed media (Status=OK) found for display.</td></tr></tbody>');
                         return;
                     }
                     
-                    // Початкове відображення: Режим "Всі Автори" (isFiltered=false)
                     const initialGrouped = groupDataByClip(fullValidData, false); 
                     renderTable(initialGrouped, false);
                     
                     setupAuthorFilter(fullValidData);
                 },
                 error: function(error) {
-                    let errorMessage = "Критична помилка завантаження даних або обробки CSV. Перевірте: 1) Назва файлу CSV. 2) Роботу Python-сервера. Деталі: " + error.message;
+                    let errorMessage = "Critical error loading data or processing CSV. Check: 1) CSV file name. 2) Python server status. Details: " + error.message;
                     $('#' + TABLE_ID).html('<tbody><tr><td colspan="4" class="alert alert-danger text-center mt-4">' + errorMessage + '</td></tr></tbody>');
                     console.error("PapaParse Error:", error);
                 }
