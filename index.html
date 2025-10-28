@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
     
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMD/CDyD1vJcK/kM5Q3gBfH7v9tV+C2mE6z6F3tC8JmS8F6B2vL2C1W/Q6H5zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMD/CDyD1vJcK/kM5Q3gBfH7v9tV+C2mE6z6F3tC8JmS8F6B2vL2C1W/Q6H5zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     
@@ -76,7 +76,7 @@
             color: white !important; 
             background-color: transparent !important; 
             border: 2px solid #08a080 !important; /* Зелена обводка */
-            border-radius: 6px !important;           
+            border-radius: 6px !important;            
             padding: 5px 10px; 
             margin: 2px;
             display: inline-block; 
@@ -227,7 +227,8 @@
             const groupedByClip = {};
             
             data.forEach(row => {
-                if (!row.Clip_Final_Name || !row.Pexels_Author) return; 
+                // 💡 ВИПРАВЛЕННЯ 1: Критерій для групування - лише Clip_Final_Name
+                if (!row.Clip_Final_Name) return; 
 
                 const clipName = row.Clip_Final_Name;
                 const author = row.Pexels_Author;
@@ -241,17 +242,20 @@
                     };
                 }
 
-                if (!groupedByClip[clipName].Authors[author]) {
-                    groupedByClip[clipName].Authors[author] = {
-                        PexelsAuthor: author,
-                        MediaItems: []
-                    };
+                // 💡 ВИПРАВЛЕННЯ 2: Додаємо автора/медіа лише, якщо Pexels_Author існує
+                if (author && author.toString().trim() !== '') {
+                    if (!groupedByClip[clipName].Authors[author]) {
+                        groupedByClip[clipName].Authors[author] = {
+                            PexelsAuthor: author,
+                            MediaItems: []
+                        };
+                    }
+                    
+                    groupedByClip[clipName].Authors[author].MediaItems.push({
+                        PexelsURL: row.Pexels_URL,
+                        PexelsID: row.Pexels_ID
+                    });
                 }
-                
-                groupedByClip[clipName].Authors[author].MediaItems.push({
-                    PexelsURL: row.Pexels_URL,
-                    PexelsID: row.Pexels_ID
-                });
             });
 
             const result = Object.values(groupedByClip).map(clip => ({
@@ -265,7 +269,7 @@
                 const dateB = b.Date.split('.').reverse().join(''); 
                 
                 if (dateA > dateB) return -1;  
-                if (dateA < dateB) return 1;   
+                if (dateA < dateB) return 1;    
                 return 0;
             });
 
@@ -319,12 +323,17 @@
                  tbody += '<tr><td colspan="' + headers.length + '">No records found.</td></tr>';
             } else {
                 groupedData.forEach(clipGroup => {
-                    if (clipGroup.Authors.length === 0) return; 
+                    // Якщо в режимі фільтрації немає авторів, це може бути порожній кліп.
+                    // У невідфільтрованому режимі, навіть якщо авторів 0, ми все одно рендеримо рядок.
+                    if (isFiltered && clipGroup.Authors.length === 0) return; 
 
-                    const totalRows = clipGroup.Authors.length; 
+                    const totalRows = clipGroup.Authors.length > 0 ? clipGroup.Authors.length : 1; // Забезпечуємо мінімум 1 рядок, навіть якщо немає авторів
                     const clipLinkHTML = `<a href="${clipGroup.ClipURL}" target="_blank" class="btn btn-youtube btn-sm"><i class="fab fa-youtube"></i> YouTube</a>`;
+                    
+                    // Якщо авторів немає (тобто кліп - власний контент), створюємо фейковий запис для рендерингу
+                    const authorsToRender = clipGroup.Authors.length > 0 ? clipGroup.Authors : [{ PexelsAuthor: '(Власний контент)', MediaItems: [] }];
 
-                    clipGroup.Authors.forEach((authorData, index) => {
+                    authorsToRender.forEach((authorData, index) => {
                         
                         let finalContent = '';
                         
@@ -418,10 +427,12 @@
                         return;
                     }
                     
-                    fullValidData = results.data.filter(row => row.Pexels_ID && row.Status === 'OK');
+                    // 💡 ВИПРАВЛЕННЯ 3: Основна фільтрація тепер базується на YouTube_ID
+                    // Це гарантує, що відображаються всі кліпи, які мають ідентифікатор YouTube
+                    fullValidData = results.data.filter(row => row.YouTube_ID);
                     
                     if (fullValidData.length === 0) {
-                        $('#' + TABLE_ID).html('<tbody><tr><td colspan="4">No confirmed media (Status=OK) found for display.</td></tr></tbody>');
+                        $('#' + TABLE_ID).html('<tbody><tr><td colspan="4">No confirmed media (with YouTube ID) found for display.</td></tr></tbody>');
                         return;
                     }
                     
@@ -442,7 +453,6 @@
                             lastIsMobile = currentIsMobile;
                         }
                     });
-                    
                 },
                 error: function(error) {
                     let errorMessage = "Critical error loading data or processing CSV. Check: 1) CSV file name. 2) Python server status. Details: " + error.message;
