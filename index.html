@@ -227,7 +227,7 @@
             const groupedByClip = {};
             
             data.forEach(row => {
-                // 💡 ВИПРАВЛЕННЯ 1: Критерій для групування - лише Clip_Final_Name
+                // Критерій для групування - лише Clip_Final_Name та наявність YouTube_ID (що гарантується fullValidData)
                 if (!row.Clip_Final_Name) return; 
 
                 const clipName = row.Clip_Final_Name;
@@ -242,7 +242,7 @@
                     };
                 }
 
-                // 💡 ВИПРАВЛЕННЯ 2: Додаємо автора/медіа лише, якщо Pexels_Author існує
+                // Додаємо автора/медіа лише, якщо Pexels_Author існує
                 if (author && author.toString().trim() !== '') {
                     if (!groupedByClip[clipName].Authors[author]) {
                         groupedByClip[clipName].Authors[author] = {
@@ -263,7 +263,7 @@
                 Authors: Object.values(clip.Authors)
             }));
 
-            // 💡 1. СОРТУВАННЯ КЛІПІВ ЗА ДАТОЮ (ВІД НАЙНОВІШОГО ДО НАЙСТАРІШОГО)
+            // СОРТУВАННЯ КЛІПІВ ЗА ДАТОЮ (ВІД НАЙНОВІШОГО ДО НАЙСТАРІШОГО)
             result.sort((a, b) => {
                 const dateA = a.Date.split('.').reverse().join(''); 
                 const dateB = b.Date.split('.').reverse().join(''); 
@@ -274,9 +274,17 @@
             });
 
 
-            // 💡 2. ЛОГІКА ДЛЯ РЕЖИМУ "ВСІ АВТОРИ":
+            // ЛОГІКА ДЛЯ РЕЖИМУ "ВСІ АВТОРИ":
             if (!isFiltered) {
                 return result.map(clip => {
+                    // Якщо немає авторів, повертаємо "(Власний контент)"
+                    if (clip.Authors.length === 0) {
+                        return {
+                            ...clip,
+                            Authors: [{ PexelsAuthor: '(Власний контент)', MediaItems: [] }]
+                        };
+                    }
+
                     const authorNames = clip.Authors.map(a => a.PexelsAuthor);
                     
                     // СОРТУВАННЯ АВТОРІВ ЗА АЛФАВІТОМ
@@ -291,6 +299,7 @@
                 });
             }
 
+            // У режимі фільтрації повертаємо як є
             return result;
         }
 
@@ -319,37 +328,46 @@
             
             let tbody = '<tbody>';
             
-            if (groupedData.length === 0) {
+            // Фільтруємо групи, щоб не показувати кліпи, які не мають жодного автора
+            const visibleGroups = isFiltered 
+                ? groupedData.filter(clipGroup => clipGroup.Authors.length > 0)
+                : groupedData;
+                
+            if (visibleGroups.length === 0) {
                  tbody += '<tr><td colspan="' + headers.length + '">No records found.</td></tr>';
             } else {
-                groupedData.forEach(clipGroup => {
-                    // Якщо в режимі фільтрації немає авторів, це може бути порожній кліп.
-                    // У невідфільтрованому режимі, навіть якщо авторів 0, ми все одно рендеримо рядок.
-                    if (isFiltered && clipGroup.Authors.length === 0) return; 
-
-                    const totalRows = clipGroup.Authors.length > 0 ? clipGroup.Authors.length : 1; // Забезпечуємо мінімум 1 рядок, навіть якщо немає авторів
-                    const clipLinkHTML = `<a href="${clipGroup.ClipURL}" target="_blank" class="btn btn-youtube btn-sm"><i class="fab fa-youtube"></i> YouTube</a>`;
-                    
-                    // Якщо авторів немає (тобто кліп - власний контент), створюємо фейковий запис для рендерингу
-                    const authorsToRender = clipGroup.Authors.length > 0 ? clipGroup.Authors : [{ PexelsAuthor: '(Власний контент)', MediaItems: [] }];
+                visibleGroups.forEach(clipGroup => {
+                    // У режимі фільтрації, ми вже знаємо, що автори є, і вони будуть лише одним елементом (обраний автор)
+                    const authorsToRender = clipGroup.Authors; 
 
                     authorsToRender.forEach((authorData, index) => {
                         
                         let finalContent = '';
                         
                         if (isFiltered) {
-                            let pexelsCellContent = '';
-                            authorData.MediaItems.forEach(media => {
-                                // 💡 ЗМІНА: ТЕКСТОВА КНОПКА Pexels
-                                pexelsCellContent += `<a href="${media.PexelsURL}" target="_blank" class="btn btn-pexels btn-sm">
-                                    pexels
-                                </a>`;
-                            });
-                            finalContent = `<div class="pexels-links-container">${pexelsCellContent}</div>`;
+                            // 💡 ЛОГІКА ВИПРАВЛЕННЯ: Генеруємо кнопки лише, якщо є посилання Pexels
+                            if (authorData.MediaItems && authorData.MediaItems.length > 0) {
+                                let pexelsCellContent = '';
+                                authorData.MediaItems.forEach(media => {
+                                    // ТЕКСТОВА КНОПКА Pexels
+                                    pexelsCellContent += `<a href="${media.PexelsURL}" target="_blank" class="btn btn-pexels btn-sm">
+                                        pexels
+                                    </a>`;
+                                });
+                                finalContent = `<div class="pexels-links-container">${pexelsCellContent}</div>`;
+                            } else {
+                                // Якщо MediaItems порожній, залишаємо finalContent порожнім.
+                                finalContent = ''; 
+                            }
                         } else {
+                            // Режим за замовчуванням
                             finalContent = `<div>${authorData.PexelsAuthor}</div>`;
                         }
 
+                        // Враховуємо, що в режимі фільтрації буде лише 1 рядок на кліп
+                        const totalRows = authorsToRender.length; 
+                        const clipLinkHTML = `<a href="${clipGroup.ClipURL}" target="_blank" class="btn btn-youtube btn-sm"><i class="fab fa-youtube"></i> YouTube</a>`;
+                        
                         tbody += `<tr class="clip-row">`;
 
                         if (index === 0) { 
@@ -427,8 +445,7 @@
                         return;
                     }
                     
-                    // 💡 ВИПРАВЛЕННЯ 3: Основна фільтрація тепер базується на YouTube_ID
-                    // Це гарантує, що відображаються всі кліпи, які мають ідентифікатор YouTube
+                    // Основна фільтрація: виводимо лише кліпи з YouTube ID
                     fullValidData = results.data.filter(row => row.YouTube_ID);
                     
                     if (fullValidData.length === 0) {
