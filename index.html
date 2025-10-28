@@ -121,16 +121,18 @@
         
         .footer-thanks { margin-top: 40px; padding: 20px 0; color: #ccc; font-size: 0.9em; border-top: 1px solid #333; }
         
-        /* 💥 СТИЛІ ДЛЯ МОБІЛЬНОЇ ВЕРСІЇ (ПОДВІЙНЕ ЗБІЛЬШЕННЯ) */
+        /* 💥 СТИЛІ ДЛЯ МОБІЛЬНОЇ ВЕРСІЇ (ФІНАЛЬНЕ РЕГУЛЮВАННЯ) */
         @media (max-width: 992px) {
             .container { max-width: 95%; padding: 10px; margin-top: 20px; }
             
-            /* ЗБІЛЬШЕННЯ ОСНОВНИХ ЗАГОЛОВКІВ */
-            h1 { font-size: 3.5em; } 
-            #subheading-thanks, #subheading-value { font-size: 1.6em; } 
-            #subheading-ua-thanks, #subheading-ua-value { font-size: 1.3em; } 
+            /* 1. ЗБІЛЬШЕННЯ ОСНОВНОГО ЗАГОЛОВКА */
+            h1 { font-size: 4.0em; } 
+            
+            /* 2. ЗБІЛЬШЕННЯ ПІДЗАГОЛОВКІВ */
+            #subheading-thanks, #subheading-value { font-size: 1.8em; } 
+            #subheading-ua-thanks, #subheading-ua-value { font-size: 1.5em; } 
 
-            /* Збільшуємо фільтр */
+            /* 3. ФІЛЬТР "PUSH ME" - БЕЗ ЗМІН */
             #filterContainer select { 
                 font-size: 2.5em !important; 
                 padding: 20px !important; 
@@ -138,7 +140,7 @@
                 width: 100% !important; 
             }
 
-            /* ЗБІЛЬШЕННЯ ТЕКСТУ В ТАБЛИЦІ ТА ЗАГОЛОВКІВ ТАБЛИЦІ */
+            /* ЗБІЛЬШЕННЯ ТЕКСТУ В ТАБЛИЦІ ТА ЗАГОЛОВКІВ ТАБЛИЦІ (Без змін) */
             .styled-table thead th { 
                 font-size: 2.0em !important; 
                 padding: 15px 5px; 
@@ -148,19 +150,21 @@
                 padding: 12px 5px;
             }
 
-            /* ЗБІЛЬШЕННЯ КНОПОК ТА ІКОНОК */
+            /* 4. ЗМЕНШЕННЯ КНОПКИ YOUTUBE */
             .styled-table tbody td a.btn-youtube { 
-                font-size: 1.8em !important; 
-                padding: 0.8rem 1.4rem !important; 
+                font-size: 1.2em !important; 
+                padding: 0.6rem 1.1rem !important; 
                 line-height: 1.3; 
             }
+            
+            /* 5. ЗНАЧНЕ ЗМЕНШЕННЯ КНОПКИ PEXELS */
             .styled-table tbody td a.btn-pexels { 
-                font-size: 1.8em !important; 
-                padding: 8px; 
-                margin: 6px; 
+                font-size: 0.5em !important; 
+                padding: 3px; 
+                margin: 4px; 
             }
             .pexels-icon {
-                height: 4.5em; 
+                height: 1.5em; 
             }
 
             /* НОВА ЛОГІКА ДЛЯ SOURCE (ВЕРТИКАЛЬНО) */
@@ -174,8 +178,8 @@
             
             .styled-table tbody td a.btn-pexels {
                 display: block; 
-                width: 90%; 
-                max-width: 200px; 
+                width: 60%; 
+                max-width: 100px; 
             }
             
             .footer-thanks { font-size: 1.2em; }
@@ -232,7 +236,7 @@
         let fullValidData = []; 
 
         // ----------------------------------------------------
-        // 1. ФУНКЦІЯ ГРУПУВАННЯ ДАНИХ (Фіксоване групування за Кліпом + Сортування за Датою)
+        // 1. ФУНКЦІЯ ГРУПУВАННЯ ДАНИХ 
         // ----------------------------------------------------
         function groupDataByClip(data, isFiltered = false) {
             const groupedByClip = {};
@@ -302,23 +306,19 @@
         }
 
         // ----------------------------------------------------
-        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ (Приховано 'date' для мобільної версії)
+        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ 
         // ----------------------------------------------------
         function renderTable(groupedData, isFiltered = false) {
             const table = document.getElementById(TABLE_ID);
             if (!table) return;
 
-            // Визначаємо, чи екран мобільний (менше або дорівнює 992px)
             const isMobile = window.matchMedia('(max-width: 992px)').matches;
 
-            // 💡 ЗАГОЛОВКИ
             let lastHeader = isFiltered ? 'source' : 'authors'; 
             let thead = '<thead><tr>';
             
-            // Заголовки для десктопу (4 колонки)
             let headers = ['clip name', 'date', 'YouTube', lastHeader];
 
-            // Заголовки для мобільного (3 колонки)
             if (isMobile) {
                 headers = ['clip name', 'YouTube', lastHeader];
             }
@@ -358,19 +358,15 @@
                         tbody += `<tr class="clip-row">`;
 
                         if (index === 0) { 
-                            // 1. Назва Кліпу
                             tbody += `<td rowspan="${totalRows}">${clipGroup.Name}</td>`;
                             
-                            // 2. Date (лише на десктопі)
                             if (!isMobile) {
                                  tbody += `<td rowspan="${totalRows}">${clipGroup.Date}</td>`;
                             }
                             
-                            // 3./4. YouTube Link
                             tbody += `<td rowspan="${totalRows}">${clipLinkHTML}</td>`;
                         }
 
-                        // Остання колонка: Authors/Source
                         tbody += `<td>${finalContent}</td>`;
                         
                         tbody += '</tr>';
@@ -396,7 +392,6 @@
                 .map(a => a.toString().trim())
                 .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase(), 'uk', { sensitivity: 'base' })); 
 
-            // Текст фільтра: "push me"
             const select = $('<select id="authorFilterSelect" class="form-select"><option value="">\u25bc&nbsp;&nbsp;&nbsp;&nbsp;push me&nbsp;&nbsp;&nbsp;&nbsp;\u25b2</option></select>')
                 .appendTo(container);
             
@@ -449,7 +444,6 @@
                     
                     setupAuthorFilter(fullValidData);
                     
-                    // 💡 Перевіряємо та перерендеримо таблицю при зміні розміру вікна 
                     let lastIsMobile = window.matchMedia('(max-width: 992px)').matches;
                     $(window).on('resize', function() {
                         const currentIsMobile = window.matchMedia('(max-width: 992px)').matches;
