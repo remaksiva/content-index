@@ -71,6 +71,7 @@
             border-color: #cc0000 !important;
         }
         
+        /* Посилання Pexels (ДЕКСТОП) */
         .styled-table tbody td a.btn-pexels {
             color: black !important;
             background-color: transparent !important; 
@@ -99,6 +100,7 @@
             border-radius: 10%; 
         }
         
+        /* КОНТЕЙНЕР ДЖЕРЕЛ (ДЕКСТОП: горизонтально) */
         .pexels-links-container {
             max-width: 550px; 
             display: flex;
@@ -119,44 +121,61 @@
         
         .footer-thanks { margin-top: 40px; padding: 20px 0; color: #ccc; font-size: 0.9em; border-top: 1px solid #333; }
         
-        /* 🚀 ОНОВЛЕНІ ТА ЗНАЧНО ЗБІЛЬШЕНІ СТИЛІ ДЛЯ МОБІЛЬНОЇ ВЕРСІЇ */
+        /* 🚀 СТИЛІ ДЛЯ МОБІЛЬНОЇ ВЕРСІЇ (ЗНАЧНО ЗБІЛЬШЕНО) */
         @media (max-width: 992px) {
             .container { max-width: 95%; padding: 10px; margin-top: 30px; }
-            h1 { font-size: 2.2em; } 
-            #subheading-thanks, #subheading-value { font-size: 1.0em; } 
-            #subheading-ua-thanks, #subheading-ua-value { font-size: 0.85em; } 
+            
+            /* ЗБІЛЬШЕННЯ ОСНОВНИХ ЗАГОЛОВКІВ */
+            h1 { font-size: 2.5em; } 
+            #subheading-thanks, #subheading-value { font-size: 1.1em; } 
+            #subheading-ua-thanks, #subheading-ua-value { font-size: 0.95em; } 
 
             /* Збільшуємо фільтр */
             #filterContainer select { 
-                font-size: 1.5em !important; 
-                padding: 12px 15px !important; 
+                font-size: 1.6em !important; 
+                padding: 15px !important; 
                 max-width: 95% !important; 
                 width: 100% !important; 
             }
 
-            /* Збільшуємо текст у таблиці */
+            /* ЗБІЛЬШЕННЯ ТЕКСТУ В ТАБЛИЦІ ТА ЗАГОЛОВКІВ ТАБЛИЦІ */
             .styled-table thead th { 
-                font-size: 1.25em !important; 
-                padding: 10px 5px; 
+                font-size: 1.35em !important; /* Значно більше */
+                padding: 12px 5px; 
             }
             .styled-table tbody td { 
-                font-size: 1.15em !important; 
+                font-size: 1.25em !important; /* Значно більше */
                 padding: 10px 5px;
             }
 
-            /* Збільшуємо кнопки */
+            /* ЗБІЛЬШЕННЯ КНОПОК ТА ІКОНОК */
             .styled-table tbody td a.btn-youtube { 
-                font-size: 1.1em !important; 
-                padding: 0.5rem 1rem !important; 
+                font-size: 1.2em !important; 
+                padding: 0.6rem 1.1rem !important; 
                 line-height: 1.3; 
             }
             .styled-table tbody td a.btn-pexels { 
-                font-size: 1.1em !important; 
-                padding: 5px; 
-                margin: 4px;
+                font-size: 1.2em !important; 
+                padding: 6px; 
+                margin: 5px;
             }
             .pexels-icon {
-                height: 3.2em; 
+                height: 3.5em; /* Значно збільшено іконку Pexels */
+            }
+
+            /* 💡 НОВА ЛОГІКА ДЛЯ SOURCE (ВЕРТИКАЛЬНО) */
+            .pexels-links-container {
+                display: flex;
+                flex-direction: column; /* Вертикальне розміщення */
+                align-items: center; /* Центруємо по горизонталі */
+                max-width: 100%;
+                margin: 0;
+            }
+            
+            .styled-table tbody td a.btn-pexels {
+                display: block; /* Займає всю ширину контейнера (елемента), щоб стати вертикально */
+                width: 80%; /* Фіксована ширина для вертикальних блоків */
+                max-width: 150px; 
             }
         }
     </style>
@@ -325,6 +344,7 @@
                         if (isFiltered) {
                             let pexelsCellContent = '';
                             authorData.MediaItems.forEach(media => {
+                                // 💡 Тут ми не змінюємо код, лише стилі в CSS, щоб вони стали вертикальними на мобільному
                                 pexelsCellContent += `<a href="${media.PexelsURL}" target="_blank" class="btn btn-pexels btn-sm">
                                     <img src="pexels_icon.png" alt="Pexels" class="pexels-icon">
                                 </a>`;
@@ -429,7 +449,6 @@
                     setupAuthorFilter(fullValidData);
                     
                     // 💡 Перевіряємо та перерендеримо таблицю при зміні розміру вікна 
-                    // (для коректного приховування/показу "date" при переході з десктопу на мобільний)
                     let lastIsMobile = window.matchMedia('(max-width: 992px)').matches;
                     $(window).on('resize', function() {
                         const currentIsMobile = window.matchMedia('(max-width: 992px)').matches;
