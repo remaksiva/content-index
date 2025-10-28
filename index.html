@@ -122,13 +122,13 @@
         /* 🚀 ОНОВЛЕНІ ТА ЗНАЧНО ЗБІЛЬШЕНІ СТИЛІ ДЛЯ МОБІЛЬНОЇ ВЕРСІЇ */
         @media (max-width: 992px) {
             .container { max-width: 95%; padding: 10px; margin-top: 30px; }
-            h1 { font-size: 2.2em; } /* Збільшено */
-            #subheading-thanks, #subheading-value { font-size: 1.0em; } /* Збільшено */
-            #subheading-ua-thanks, #subheading-ua-value { font-size: 0.85em; } /* Збільшено */
+            h1 { font-size: 2.2em; } 
+            #subheading-thanks, #subheading-value { font-size: 1.0em; } 
+            #subheading-ua-thanks, #subheading-ua-value { font-size: 0.85em; } 
 
             /* Збільшуємо фільтр */
             #filterContainer select { 
-                font-size: 1.5em !important; /* Значно більше */
+                font-size: 1.5em !important; 
                 padding: 12px 15px !important; 
                 max-width: 95% !important; 
                 width: 100% !important; 
@@ -136,27 +136,27 @@
 
             /* Збільшуємо текст у таблиці */
             .styled-table thead th { 
-                font-size: 1.25em !important; /* Значно більше */
+                font-size: 1.25em !important; 
                 padding: 10px 5px; 
             }
             .styled-table tbody td { 
-                font-size: 1.15em !important; /* Значно більше */
+                font-size: 1.15em !important; 
                 padding: 10px 5px;
             }
 
             /* Збільшуємо кнопки */
             .styled-table tbody td a.btn-youtube { 
-                font-size: 1.1em !important; /* Значно більше */
+                font-size: 1.1em !important; 
                 padding: 0.5rem 1rem !important; 
                 line-height: 1.3; 
             }
             .styled-table tbody td a.btn-pexels { 
-                font-size: 1.1em !important; /* Значно більше */
+                font-size: 1.1em !important; 
                 padding: 5px; 
                 margin: 4px;
             }
             .pexels-icon {
-                height: 3.2em; /* Значно збільшено іконку Pexels */
+                height: 3.2em; 
             }
         }
     </style>
@@ -281,16 +281,27 @@
         }
 
         // ----------------------------------------------------
-        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ (Оновлені заголовки в нижньому регістрі)
+        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ (Приховано 'date' для мобільної версії)
         // ----------------------------------------------------
         function renderTable(groupedData, isFiltered = false) {
             const table = document.getElementById(TABLE_ID);
             if (!table) return;
 
-            // 💡 ЗАГОЛОВКИ У НИЖНЬОМУ РЕГІСТРІ (Крім YouTube)
+            // Визначаємо, чи екран мобільний (менше або дорівнює 992px)
+            const isMobile = window.matchMedia('(max-width: 992px)').matches;
+
+            // 💡 ЗАГОЛОВКИ
             let lastHeader = isFiltered ? 'source' : 'authors'; 
             let thead = '<thead><tr>';
-            const headers = ['clip name', 'date', 'YouTube', lastHeader]; 
+            
+            // Заголовки для десктопу (4 колонки)
+            let headers = ['clip name', 'date', 'YouTube', lastHeader];
+
+            // Заголовки для мобільного (3 колонки)
+            if (isMobile) {
+                headers = ['clip name', 'YouTube', lastHeader];
+            }
+            
             headers.forEach(h => {
                 thead += `<th>${h}</th>`;
             });
@@ -299,7 +310,7 @@
             let tbody = '<tbody>';
             
             if (groupedData.length === 0) {
-                 tbody += '<tr><td colspan="4">No records found.</td></tr>';
+                 tbody += '<tr><td colspan="' + headers.length + '">No records found.</td></tr>';
             } else {
                 groupedData.forEach(clipGroup => {
                     if (clipGroup.Authors.length === 0) return; 
@@ -326,16 +337,22 @@
                         tbody += `<tr class="clip-row">`;
 
                         if (index === 0) { 
-                            tbody += `
-                                <td rowspan="${totalRows}">${clipGroup.Name}</td>
-                                <td rowspan="${totalRows}">${clipGroup.Date}</td>
-                                <td rowspan="${totalRows}">${clipLinkHTML}</td>
-                            `;
+                            // 1. Назва Кліпу
+                            tbody += `<td rowspan="${totalRows}">${clipGroup.Name}</td>`;
+                            
+                            // 2. Date (лише на десктопі)
+                            if (!isMobile) {
+                                 tbody += `<td rowspan="${totalRows}">${clipGroup.Date}</td>`;
+                            }
+                            
+                            // 3./4. YouTube Link
+                            tbody += `<td rowspan="${totalRows}">${clipLinkHTML}</td>`;
                         }
 
-                        tbody += `
-                            <td>${finalContent}</td>
-                        </tr>`;
+                        // Остання колонка: Authors/Source
+                        tbody += `<td>${finalContent}</td>`;
+                        
+                        tbody += '</tr>';
                     });
                 });
             }
@@ -410,6 +427,23 @@
                     renderTable(initialGrouped, false);
                     
                     setupAuthorFilter(fullValidData);
+                    
+                    // 💡 Перевіряємо та перерендеримо таблицю при зміні розміру вікна 
+                    // (для коректного приховування/показу "date" при переході з десктопу на мобільний)
+                    let lastIsMobile = window.matchMedia('(max-width: 992px)').matches;
+                    $(window).on('resize', function() {
+                        const currentIsMobile = window.matchMedia('(max-width: 992px)').matches;
+                        if (currentIsMobile !== lastIsMobile) {
+                            // Перерендерити, якщо відбувся перехід між мобільним/десктопом
+                            const selectValue = $('#authorFilterSelect').val();
+                            const isFiltered = !!selectValue;
+                            const filteredData = selectValue ? fullValidData.filter(row => row.Pexels_Author === selectValue) : fullValidData;
+                            const grouped = groupDataByClip(filteredData, isFiltered); 
+                            renderTable(grouped, isFiltered);
+                            lastIsMobile = currentIsMobile;
+                        }
+                    });
+                    
                 },
                 error: function(error) {
                     let errorMessage = "Critical error loading data or processing CSV. Check: 1) CSV file name. 2) Python server status. Details: " + error.message;
