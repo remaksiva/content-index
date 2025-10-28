@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
     
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMD/CDyD1vJcK/kM5Q3gBfH7v9tV+C2mE6z6F3tC8JmS8F6B2vL2C1W/Q6H5zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPH544uWIX+LLMD/CDyD1vJcK/kM5Q3gBfH7v9tV+C2mE6z6F3tC8JmS8F6B2vL2C1W/Q6H5zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     
@@ -221,17 +221,18 @@
         let fullValidData = []; 
 
         // ----------------------------------------------------
-        // 1. ФУНКЦІЯ ГРУПУВАННЯ ДАНИХ 
+        // 1. ФУНКЦІЯ ГРУПУВАННЯ ДАНИХ (АГРЕГАЦІЯ)
         // ----------------------------------------------------
         function groupDataByClip(data, isFiltered = false) {
             const groupedByClip = {};
             
             data.forEach(row => {
-                // Критерій для групування - лише Clip_Final_Name та наявність YouTube_ID (що гарантується fullValidData)
+                // Критерій для групування - лише Clip_Final_Name та наявність YouTube_ID
                 if (!row.Clip_Final_Name) return; 
 
                 const clipName = row.Clip_Final_Name;
                 const author = row.Pexels_Author;
+                const pexelsUrl = row.Pexels_URL; // Отримуємо Pexels URL
 
                 if (!groupedByClip[clipName]) {
                     groupedByClip[clipName] = {
@@ -242,19 +243,24 @@
                     };
                 }
 
-                // Додаємо автора/медіа лише, якщо Pexels_Author існує
+                
                 if (author && author.toString().trim() !== '') {
+                    // 1. ГАРАНТУЄМО, ЩО ЗАПИС ПРО АВТОРА ІСНУЄ (навіть якщо MediaItems буде порожнім)
                     if (!groupedByClip[clipName].Authors[author]) {
                         groupedByClip[clipName].Authors[author] = {
                             PexelsAuthor: author,
-                            MediaItems: []
+                            MediaItems: [] // Сюди збираємо всі посилання Pexels цього автора ДЛЯ ЦЬОГО КЛІПУ
                         };
                     }
                     
-                    groupedByClip[clipName].Authors[author].MediaItems.push({
-                        PexelsURL: row.Pexels_URL,
-                        PexelsID: row.Pexels_ID
-                    });
+                    // 2. ДОДАЄМО ЕЛЕМЕНТ ДО MEDIAITEMS ТІЛЬКИ, ЯКЩО ПОСИЛАННЯ ВАЛІДНЕ
+                    if (pexelsUrl && pexelsUrl.toString().trim() !== '') {
+                         // КОЖЕН РЯДОК CSV = ОДНЕ ПОСИЛАННЯ PEXELS
+                        groupedByClip[clipName].Authors[author].MediaItems.push({
+                            PexelsURL: pexelsUrl,
+                            PexelsID: row.Pexels_ID
+                        });
+                    }
                 }
             });
 
@@ -294,6 +300,7 @@
                     
                     return {
                         ...clip,
+                        // У режимі "всі автори" ми об'єднуємо всіх авторів в один рядок
                         Authors: [{ PexelsAuthor: allAuthorsList, MediaItems: [] }]
                     };
                 });
@@ -304,7 +311,7 @@
         }
 
         // ----------------------------------------------------
-        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ 
+        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ (ВКЛ. ПЕРЕВІРКУ ПОСИЛАНЬ)
         // ----------------------------------------------------
         function renderTable(groupedData, isFiltered = false) {
             const table = document.getElementById(TABLE_ID);
@@ -328,16 +335,14 @@
             
             let tbody = '<tbody>';
             
-            // Фільтруємо групи, щоб не показувати кліпи, які не мають жодного автора
-            const visibleGroups = isFiltered 
-                ? groupedData.filter(clipGroup => clipGroup.Authors.length > 0)
-                : groupedData;
+            // 💡 ВИПРАВЛЕННЯ: У ФІЛЬТРОВАНОМУ РЕЖИМІ НЕ ПРИХОВУЄМО КЛІПИ З ПУСТИМИ ПОСИЛАННЯМИ
+            const visibleGroups = groupedData; 
                 
             if (visibleGroups.length === 0) {
                  tbody += '<tr><td colspan="' + headers.length + '">No records found.</td></tr>';
             } else {
                 visibleGroups.forEach(clipGroup => {
-                    // У режимі фільтрації, ми вже знаємо, що автори є, і вони будуть лише одним елементом (обраний автор)
+                    // У режимі фільтрації, AuthorsToRender містить лише одного елемента - дані вибраного автора для цього кліпу.
                     const authorsToRender = clipGroup.Authors; 
 
                     authorsToRender.forEach((authorData, index) => {
@@ -345,9 +350,11 @@
                         let finalContent = '';
                         
                         if (isFiltered) {
-                            // 💡 ЛОГІКА ВИПРАВЛЕННЯ: Генеруємо кнопки лише, якщо є посилання Pexels
+                            // 👇 ЦЕЙ БЛОК ВИКОНУЄ ВАШУ ЛОГІКУ:
+                            // 1. Перевіряємо, чи є ВАЛІДНІ посилання Pexels (MediaItems) у цього автора ДЛЯ ЦЬОГО КЛІПУ
                             if (authorData.MediaItems && authorData.MediaItems.length > 0) {
                                 let pexelsCellContent = '';
+                                // 2. Створюємо ОКРЕМУ кнопку для КОЖНОГО посилання у масиві MediaItems
                                 authorData.MediaItems.forEach(media => {
                                     // ТЕКСТОВА КНОПКА Pexels
                                     pexelsCellContent += `<a href="${media.PexelsURL}" target="_blank" class="btn btn-pexels btn-sm">
@@ -356,11 +363,11 @@
                                 });
                                 finalContent = `<div class="pexels-links-container">${pexelsCellContent}</div>`;
                             } else {
-                                // Якщо MediaItems порожній, залишаємо finalContent порожнім.
+                                // 3. Якщо посилань немає (length === 0), залишаємо finalContent порожнім.
                                 finalContent = ''; 
                             }
                         } else {
-                            // Режим за замовчуванням
+                            // Режим за замовчуванням (список усіх авторів)
                             finalContent = `<div>${authorData.PexelsAuthor}</div>`;
                         }
 
@@ -420,10 +427,12 @@
                 let isFiltered = false; 
 
                 if (selectedAuthor) {
+                    // Фільтруємо початкові дані за вибраним автором
                     filteredData = fullValidData.filter(row => row.Pexels_Author === selectedAuthor);
                     isFiltered = true;
                 }
                 
+                // Групуємо ВЖЕ ВІДФІЛЬТРОВАНІ дані
                 const grouped = groupDataByClip(filteredData, isFiltered); 
                 renderTable(grouped, isFiltered); 
             });
