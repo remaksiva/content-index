@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     
     <style>
-        /* БАЗОВІ СТИЛІ */
+        /* БАЗОВІ СТИЛІ (ДЕСКТОП) */
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #222; }
         .container { margin: 100px auto 20px auto; max-width: 90%; padding: 20px; border-radius: 8px; box-shadow: 0 0 20px rgba(204, 0, 105, 0.3); }
         h1 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 2.8em; color: #ffffff; margin-bottom: 20px; text-align: center; text-shadow: 2px 2px 6px rgba(204, 0, 105, 0.7); letter-spacing: 2px; padding-top: 10px; }
@@ -26,7 +26,7 @@
         #logo-image:hover { opacity: 0.8; }
         #channelButtonContainer { text-align: center; margin-bottom: 20px; }
 
-        /* СТИЛІ ТАБЛИЦІ */
+        /* СТИЛІ ТАБЛИЦІ (ДЕСКТОП) */
         .styled-table {
             width: 100%;
             border-collapse: separate; 
@@ -57,7 +57,7 @@
             background-color: #333; 
         }
         
-        /* КНОПКИ ТА ПОСИЛАННЯ */
+        /* КНОПКИ ТА ПОСИЛАННЯ (ДЕСКТОП) */
         .styled-table tbody td a.btn-youtube {
             color: white !important;
             background-color: #cc0069 !important; 
@@ -107,7 +107,7 @@
             margin: 0 auto;
         }
 
-        /* ФІЛЬТР */
+        /* ФІЛЬТР (ДЕСКТОП) */
         #filterContainer { margin-bottom: 25px; display: flex; justify-content: center; align-items: center; text-align: center; }
         #filterContainer select {
             -webkit-appearance: none; -moz-appearance: none; appearance: none;
@@ -119,44 +119,44 @@
         
         .footer-thanks { margin-top: 40px; padding: 20px 0; color: #ccc; font-size: 0.9em; border-top: 1px solid #333; }
         
-        /* АДАПТИВНІСТЬ ДЛЯ МОБІЛЬНОЇ ВЕРСІЇ */
+        /* 🚀 ОНОВЛЕНІ ТА ЗНАЧНО ЗБІЛЬШЕНІ СТИЛІ ДЛЯ МОБІЛЬНОЇ ВЕРСІЇ */
         @media (max-width: 992px) {
-            .container { max-width: 95%; padding: 10px; margin-top: 50px; }
-            h1 { font-size: 2.0em; }
-            #subheading-thanks, #subheading-value { font-size: 0.9em; }
-            #subheading-ua-thanks, #subheading-ua-value { font-size: 0.75em; }
+            .container { max-width: 95%; padding: 10px; margin-top: 30px; }
+            h1 { font-size: 2.2em; } /* Збільшено */
+            #subheading-thanks, #subheading-value { font-size: 1.0em; } /* Збільшено */
+            #subheading-ua-thanks, #subheading-ua-value { font-size: 0.85em; } /* Збільшено */
 
             /* Збільшуємо фільтр */
             #filterContainer select { 
-                font-size: 1.3em !important; 
-                padding: 10px 15px !important; 
+                font-size: 1.5em !important; /* Значно більше */
+                padding: 12px 15px !important; 
                 max-width: 95% !important; 
                 width: 100% !important; 
             }
 
             /* Збільшуємо текст у таблиці */
             .styled-table thead th { 
-                font-size: 1.1em !important; 
-                padding: 8px 5px; 
+                font-size: 1.25em !important; /* Значно більше */
+                padding: 10px 5px; 
             }
             .styled-table tbody td { 
-                font-size: 1.0em !important; 
-                padding: 8px 5px;
+                font-size: 1.15em !important; /* Значно більше */
+                padding: 10px 5px;
             }
 
             /* Збільшуємо кнопки */
             .styled-table tbody td a.btn-youtube { 
-                font-size: 1.0em !important; 
-                padding: 0.4rem 0.8rem !important; 
-                line-height: 1.2; 
+                font-size: 1.1em !important; /* Значно більше */
+                padding: 0.5rem 1rem !important; 
+                line-height: 1.3; 
             }
             .styled-table tbody td a.btn-pexels { 
-                font-size: 1.0em !important; 
-                padding: 4px; 
-                margin: 3px;
+                font-size: 1.1em !important; /* Значно більше */
+                padding: 5px; 
+                margin: 4px;
             }
             .pexels-icon {
-                height: 2.8em; 
+                height: 3.2em; /* Значно збільшено іконку Pexels */
             }
         }
     </style>
@@ -251,11 +251,9 @@
 
             // 💡 1. СОРТУВАННЯ КЛІПІВ ЗА ДАТОЮ (ВІД НАЙНОВІШОГО ДО НАЙСТАРІШОГО)
             result.sort((a, b) => {
-                // Припускаємо формат дати DD.MM.YYYY і перетворюємо його на YYYYMMDD для коректного порівняння
                 const dateA = a.Date.split('.').reverse().join(''); 
                 const dateB = b.Date.split('.').reverse().join(''); 
                 
-                // Сортування за спаданням
                 if (dateA > dateB) return -1;  
                 if (dateA < dateB) return 1;   
                 return 0;
@@ -267,7 +265,7 @@
                 return result.map(clip => {
                     const authorNames = clip.Authors.map(a => a.PexelsAuthor);
                     
-                    // СОРТУВАННЯ АВТОРІВ ЗА АЛФАВІТОМ (Ігнорує регістр)
+                    // СОРТУВАННЯ АВТОРІВ ЗА АЛФАВІТОМ
                     authorNames.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase(), 'uk', { sensitivity: 'base' })); 
                     
                     const allAuthorsList = authorNames.join('<br>');
@@ -283,17 +281,16 @@
         }
 
         // ----------------------------------------------------
-        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ (Оновлені заголовки)
+        // 2. ФУНКЦІЯ РЕНДЕРИНГУ ТАБЛИЦІ (Оновлені заголовки в нижньому регістрі)
         // ----------------------------------------------------
         function renderTable(groupedData, isFiltered = false) {
             const table = document.getElementById(TABLE_ID);
             if (!table) return;
 
-            // 💡 ОНОВЛЕННЯ ЗАГОЛОВКІВ НА АНГЛІЙСЬКУ
-            let lastHeader = isFiltered ? 'Source' : 'Authors'; // Source у режимі фільтра, Authors у режимі "Всі"
+            // 💡 ЗАГОЛОВКИ У НИЖНЬОМУ РЕГІСТРІ (Крім YouTube)
+            let lastHeader = isFiltered ? 'source' : 'authors'; 
             let thead = '<thead><tr>';
-            // Clip Name | Date | YouTube | Authors/Source
-            const headers = ['Clip Name', 'Date', 'YouTube', lastHeader]; 
+            const headers = ['clip name', 'date', 'YouTube', lastHeader]; 
             headers.forEach(h => {
                 thead += `<th>${h}</th>`;
             });
