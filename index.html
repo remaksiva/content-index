@@ -8,14 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
     
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPH544uWIX+LLMD/CDyD1vJcK/kM5Q3gBfH7v9tV+C2mE6z6F3tC8JmS8F6B2vL2C1W/Q6H5zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- ВИПРАВЛЕНО: Видалено некоректний атрибут 'xintegrity' -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     
     <style>
         /* БАЗОВІ СТИЛІ (ДЕСКТОП) */
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #222; }
-        .container { margin: 100px auto 20px auto; max-width: 90%; padding: 20px; border-radius: 8px; box-shadow: 0 0 20px (204, 0, 105, 0.3); }
+        /* ВИПРАВЛЕНО: Додано rgba() для box-shadow */
+        .container { margin: 100px auto 20px auto; max-width: 90%; padding: 20px; border-radius: 8px; box-shadow: 0 0 20px rgba(204, 0, 105, 0.3); }
         h1 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 2.8em; color: #ffffff; margin-bottom: 20px; text-align: center; text-shadow: 2px 2px 6px rgba(204, 0, 105, 0.7); letter-spacing: 2px; padding-top: 10px; }
         #subheading-thanks, #subheading-value { font-family: 'Montserrat', sans-serif; font-size: 1.1em; font-weight: 600; color: #ccc; text-align: center; }
         #subheading-thanks { margin-top: -15px; margin-bottom: 5px; }
@@ -270,10 +272,10 @@
             }));
 
             // СОРТУВАННЯ КЛІПІВ ЗА ДАТОЮ (ВІД НАЙНОВІШОГО ДО НАЙСТАРІШОГО)
+            // Використовуємо рядок дати у форматі ISO 8601 (РРРР-ММ-ДД), що гарантує коректне сортування.
             result.sort((a, b) => {
-                // Розділяємо дату (ДД.ММ.РРРР), перевертаємо (РРРР.ММ.ДД), об'єднуємо (РРРРММДД) для коректного порівняння
-                const dateA = a.Date.split('.').reverse().join(''); 
-                const dateB = b.Date.split('.').reverse().join(''); 
+                const dateA = a.Date; 
+                const dateB = b.Date; 
                 
                 if (dateA > dateB) return -1;  
                 if (dateA < dateB) return 1;    
@@ -381,8 +383,13 @@
                             tbody += `<td rowspan="${totalRows}">${clipGroup.Name}</td>`;
                             
                             if (!isMobile) {
-                                // 💡 ЗМІНА ТУТ: Використовуємо оригінальний формат дати ДД.ММ.РРРР (з крапками)
-                                const formattedDate = clipGroup.Date;
+                                // 💡 Перетворюємо формат дати з РРРР-ММ-ДД на ДД.ММ.РРРР з крапками для відображення
+                                const dateParts = clipGroup.Date.split('-');
+                                let formattedDate = clipGroup.Date;
+                                if (dateParts.length === 3) {
+                                    const [year, month, day] = dateParts;
+                                    formattedDate = `${day}.${month}.${year}`;
+                                }
                                 tbody += `<td rowspan="${totalRows}">${formattedDate}</td>`;
                             }
                             
