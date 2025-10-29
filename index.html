@@ -15,7 +15,7 @@
     <style>
         /* БАЗОВІ СТИЛІ (ДЕСКТОП) */
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #222; }
-        .container { margin: 100px auto 20px auto; max-width: 90%; padding: 20px; border-radius: 8px; box-shadow: 0 0 20px rgba(204, 0, 105, 0.3); }
+        .container { margin: 100px auto 20px auto; max-width: 90%; padding: 20px; border-radius: 8px; box-shadow: 0 0 20px (204, 0, 105, 0.3); }
         h1 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 2.8em; color: #ffffff; margin-bottom: 20px; text-align: center; text-shadow: 2px 2px 6px rgba(204, 0, 105, 0.7); letter-spacing: 2px; padding-top: 10px; }
         #subheading-thanks, #subheading-value { font-family: 'Montserrat', sans-serif; font-size: 1.1em; font-weight: 600; color: #ccc; text-align: center; }
         #subheading-thanks { margin-top: -15px; margin-bottom: 5px; }
@@ -271,6 +271,7 @@
 
             // СОРТУВАННЯ КЛІПІВ ЗА ДАТОЮ (ВІД НАЙНОВІШОГО ДО НАЙСТАРІШОГО)
             result.sort((a, b) => {
+                // Розділяємо дату (ДД.ММ.РРРР), перевертаємо (РРРР.ММ.ДД), об'єднуємо (РРРРММДД) для коректного порівняння
                 const dateA = a.Date.split('.').reverse().join(''); 
                 const dateB = b.Date.split('.').reverse().join(''); 
                 
@@ -335,7 +336,6 @@
             
             let tbody = '<tbody>';
             
-            // 💡 ВИПРАВЛЕННЯ: У ФІЛЬТРОВАНОМУ РЕЖИМІ НЕ ПРИХОВУЄМО КЛІПИ З ПУСТИМИ ПОСИЛАННЯМИ
             const visibleGroups = groupedData; 
                 
             if (visibleGroups.length === 0) {
@@ -381,7 +381,9 @@
                             tbody += `<td rowspan="${totalRows}">${clipGroup.Name}</td>`;
                             
                             if (!isMobile) {
-                                 tbody += `<td rowspan="${totalRows}">${clipGroup.Date}</td>`;
+                                // 💡 ЗМІНА ТУТ: Використовуємо оригінальний формат дати ДД.ММ.РРРР (з крапками)
+                                const formattedDate = clipGroup.Date;
+                                tbody += `<td rowspan="${totalRows}">${formattedDate}</td>`;
                             }
                             
                             tbody += `<td rowspan="${totalRows}">${clipLinkHTML}</td>`;
